@@ -541,9 +541,26 @@ const Intel = () => {
         }
 
         @media (max-width: 900px) { 
-          .feed-grid { grid-template-columns: 1fr; gap: 2rem; } 
-          .intel-modal-overlay { padding: 1rem; }
+          .feed-grid { grid-template-columns: 1fr; gap: 1.5rem; } 
+          .intel-modal-overlay { padding: 0; }
+          .intel-modal-container { 
+            max-width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+          }
           .modal-telemetry-overlay { display: none; }
+        }
+
+        @media (max-width: 768px) {
+          .feed-info { padding: 0.8rem 1rem; font-size: 0.6rem; }
+          .focus-btn { padding: 0.5rem 1rem; font-size: 0.58rem; }
+          .hud-top, .hud-bottom { font-size: 0.58rem; }
+          .intel-modal-header { padding: 0.8rem 1.2rem; font-size: 0.68rem; }
+          .intel-modal-footer { font-size: 0.52rem; padding: 0.6rem 1rem; }
+          .close-btn { padding: 8px; }
         }
       `}</style>
     </div>

@@ -167,7 +167,9 @@ const Drone = ({ activeTab, isHomeZone, isOffline }) => {
     };
   }, [mouseX, mouseY, rotation, clickScale, isOffline]);
 
-  if (isOffline) return null;
+  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  if (isOffline || isTouchDevice) return null;
+
 
   const labelColor = isHomeZone ? 'var(--emerald)' : 'var(--yellow)';
 

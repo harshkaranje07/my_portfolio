@@ -207,6 +207,20 @@ const App = () => {
         </AnimatePresence>
       </main>
 
+      {/* Mobile Bottom Navigation Bar — only visible on screens ≤ 768px */}
+      <nav className="mobile-nav-bar">
+        {NAV_ITEMS.map((item) => (
+          <button
+            key={item.id}
+            className={`mobile-nav-btn ${activeTab === item.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(item.id)}
+          >
+            <div className="mobile-nav-icon">{item.icon}</div>
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+
       <SpeedInsights />
 
       <style jsx>{`
@@ -397,10 +411,86 @@ const App = () => {
           .content-area { margin-left: 70px; padding: 2rem; }
         }
 
+        /* ============================================
+           MOBILE LAYOUT — Bottom Navigation Bar
+           Desktop/tablet layout is completely unchanged
+           ============================================ */
         @media (max-width: 768px) {
-          .nav-sidebar { width: 60px; }
-          .content-area { margin-left: 60px; padding: 1.5rem; }
-          .status-bar { padding: 0 1rem; font-size: 0.6rem; }
+          /* Hide the left sidebar entirely */
+          .nav-sidebar {
+            display: none;
+          }
+
+          /* Shift content to full width with bottom padding for nav bar */
+          .content-area {
+            margin-left: 0;
+            margin-top: 40px;
+            padding: 1.2rem 1rem 6rem 1rem;
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+          }
+
+          /* Status bar compact */
+          .status-bar {
+            padding: 0 1rem;
+            font-size: 0.55rem;
+          }
+
+          /* Hide verbose items on mobile status bar */
+          .team-branding { display: none; }
+
+          /* Bottom Mobile Navigation Bar */
+          .mobile-nav-bar {
+            display: flex !important;
+          }
+        }
+
+        /* Mobile bottom nav — hidden by default (desktop) */
+        .mobile-nav-bar {
+          display: none;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 64px;
+          background: rgba(5, 5, 5, 0.97);
+          border-top: 1px solid var(--border-dim);
+          z-index: 2000;
+          align-items: center;
+          justify-content: space-around;
+          padding: 0 0.5rem;
+          backdrop-filter: blur(10px);
+        }
+
+        .mobile-nav-btn {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          background: transparent;
+          border: none;
+          color: var(--text-dim);
+          font-family: var(--font-tech);
+          font-size: 0.42rem;
+          letter-spacing: 1.5px;
+          padding: 0.5rem 0.4rem;
+          cursor: pointer;
+          transition: color 0.2s ease;
+          flex: 1;
+        }
+
+        .mobile-nav-btn.active {
+          color: var(--yellow);
+        }
+
+        .mobile-nav-btn.active svg {
+          filter: drop-shadow(0 0 4px var(--yellow-glow));
+        }
+
+        .mobile-nav-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       `}</style>
     </div>

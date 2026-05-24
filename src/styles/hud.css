@@ -29,6 +29,14 @@ body.modal-open * {
   cursor: auto !important;
 }
 
+/* Restore standard cursor on touch/mobile devices */
+@media (hover: none) and (pointer: coarse) {
+  *, *::before, *::after {
+    cursor: auto !important;
+  }
+}
+
+
 body {
   background: var(--bg-dark);
   color: var(--text-main);

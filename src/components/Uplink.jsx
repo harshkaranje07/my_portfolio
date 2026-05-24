@@ -238,6 +238,19 @@ const Uplink = () => {
           .radar-base { width: 220px; height: 220px; }
           .radar-station { padding: 2.5rem; }
         }
+
+        @media (max-width: 768px) {
+          .uplink-grid { gap: 2rem; }
+          /* Hide radar on mobile to keep it clean */
+          .radar-station { display: none; }
+          .contact-terminal { border: 1px solid var(--border-dim); }
+          .terminal-body { padding: 1.8rem 1.2rem; }
+          .chan-btn { padding: 1.2rem; gap: 1rem; }
+          .chan-val { font-size: 0.78rem; }
+          .soc-link { padding: 1.2rem; font-size: 1rem; }
+          .social-row { gap: 0.8rem; }
+          .operator-id { font-size: 0.72rem; margin-bottom: 1.5rem; }
+        }
       `}</style>
     </div>
   );

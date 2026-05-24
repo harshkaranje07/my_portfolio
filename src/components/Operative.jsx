@@ -615,6 +615,29 @@ const Operative = () => {
           .id-tags { width: 100%; margin-top: 1.8rem; }
           .skill-detail-panel { width: min(95vw, 380px); }
         }
+
+        @media (max-width: 768px) {
+          .dossier-grid { gap: 2rem; }
+          .profile-section-wrap { gap: 1.5rem; }
+          .profile-container { max-width: 240px; margin: 0 auto; }
+          .mission-objective-block { margin-top: 2rem; }
+          .technical-paragraph { font-size: 0.9rem; padding-left: 1.2rem; }
+          .tag-item { font-size: 0.74rem; }
+          .capabilities-section { margin-bottom: 3rem; }
+          .capability-card { padding: 1rem 1.2rem; }
+          .skill-detail-panel { 
+            position: fixed;
+            top: auto;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            transform: none;
+            width: 100%;
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 0;
+          }
+        }
       `}</style>
     </div>
   );

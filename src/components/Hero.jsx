@@ -528,9 +528,29 @@ const Hero = ({ isHomeZone }) => {
         }
 
         @media (max-width: 768px) {
-          .hero-title { font-size: 2.2rem; }
-          .hero-subtitle { font-size: 0.75rem; letter-spacing: 3px; margin-bottom: 4rem; }
-          .mission-tag { font-size: 0.6rem; letter-spacing: 0.3rem; }
+          .hero-container { align-items: flex-start; padding-top: 2.5rem; }
+          .hud-floating-text { padding: 1rem 0.5rem; }
+          .hero-top-tag { margin-bottom: 1.2rem; }
+          .mission-tag { font-size: 0.55rem; letter-spacing: 0.25rem; }
+          .hero-title { font-size: 2rem; letter-spacing: -0.5px; margin-bottom: 0.8rem; }
+          .hero-subtitle { font-size: 0.65rem; letter-spacing: 2.5px; margin-bottom: 3rem; }
+          .section-label { font-size: 0.7rem; letter-spacing: 5px; margin-bottom: 2rem; }
+          .interests-list-layout { 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1.5rem 2rem;
+            padding: 0 0.5rem;
+          }
+          .aoi-system-module { align-items: flex-start; }
+          .aoi-text-group { gap: 0.8rem; }
+          .aoi-label { font-size: 0.82rem; white-space: normal; }
+          .aoi-id { font-size: 0.65rem; min-width: 45px; }
+          /* Hide decorative corner radar markers on mobile */
+          .radar-hud-markers { display: none; }
+        }
+
+        @media (max-width: 380px) {
+          .hero-title { font-size: 1.7rem; }
+          .interests-list-layout { grid-template-columns: 1fr; }
         }
       `}</style>
     </div>
