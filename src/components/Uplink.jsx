@@ -67,8 +67,8 @@ const Uplink = () => {
               </a>
 
               <div className="social-row">
-                <a href="#" className="soc-link tech-card uplink-glow-text"><Linkedin size={17} /></a>
-                <a href="#" className="soc-link tech-card uplink-glow-text"><Github size={17} /></a>
+                <a href="https://www.linkedin.com/in/harshwardhankaranje/" target="_blank" rel="noopener noreferrer" className="soc-link tech-card uplink-glow-text"><Linkedin size={17} /></a>
+                <a href="https://github.com/harshkaranje07" target="_blank" rel="noopener noreferrer" className="soc-link tech-card uplink-glow-text"><Github size={17} /></a>
               </div>
             </div>
           </div>
