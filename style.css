@@ -1,0 +1,181 @@
+
+:root {
+  --yellow: #facc15;
+  --yellow-glow: rgba(250, 204, 21, 0.4);
+  --azure: #38bdf8;
+  --bg-dark: #020202;
+  --border-dim: rgba(255, 255, 255, 0.08);
+  --border-bright: rgba(250, 204, 21, 0.35);
+  --text-main: #f1f5f9;
+  --text-dim: #94a3b8;
+  --font-tech: 'Orbitron', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --emerald: #10b981;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* BOOT SEQUENCE */
+#boot-sequence {
+  position: fixed; inset: 0; background: #000; z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1);
+  pointer-events: auto;
+}
+.terminal-text { font-family: var(--font-mono); color: var(--yellow); width: 480px; font-size: 14px; text-shadow: 0 0 10px var(--yellow-glow); }
+.boot-header { font-family: var(--font-tech); font-weight: 900; color: #fff; border-bottom: 2px solid var(--yellow); padding-bottom: 12px; margin-bottom: 25px; font-size: 20px; }
+.progress-bar-container { height: 2px; background: rgba(255,255,255,0.1); margin: 30px 0; }
+.progress-bar { height: 100%; background: var(--yellow); width: 0; animation: bootLoad 2s forwards ease-in-out; }
+@keyframes bootLoad { to { width: 100%; } }
+body:not(.booting) #boot-sequence { opacity: 0; pointer-events: none; }
+
+/* HUD BACKGROUND */
+.hud-background { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at 50% 50%, #0d0d0d 0%, #000 100%); }
+.grid-overlay {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+.scanline { position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.08) 50%); background-size: 100% 4px; z-index: 5; }
+
+/* HUD TOP BARS */
+.hud-top-bar { position: fixed; top: 70px; display: flex; gap: 30px; font-family: var(--font-mono); font-size: 11px; z-index: 10; color: var(--yellow); }
+.hud-top-bar.left { left: 40px; }
+.hud-top-bar.right { right: 40px; }
+.hud-data-bit .lbl { color: var(--text-dim); margin-right: 5px; }
+
+/* HUD SCROLL TAPES */
+.v-tape { position: absolute; top: 50%; transform: translateY(-50%); width: 45px; height: 320px; border-left: 1px solid var(--border-bright); background: rgba(0,0,0,0.4); overflow: hidden; font-family: var(--font-mono); font-size: 10px; color: var(--yellow); opacity: 0.15; }
+.v-tape.tape-l { left: 15px; }
+.v-tape.tape-r { right: 15px; border-left: 0; border-right: 1px solid var(--border-bright); }
+.tape-inner { display: flex; flex-direction: column; gap: 40px; animation: tapeScroll 10s infinite linear; align-items: center; }
+@keyframes tapeScroll { from { transform: translateY(0); } to { transform: translateY(-120px); } }
+
+/* TELEMETRY PODS */
+.pod { position: fixed; bottom: 80px; display: flex; flex-direction: column; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--azure); opacity: 0.7; }
+.pod-bl { left: 40px; }
+.pod-br { right: 40px; text-align: right; color: var(--yellow); }
+
+/* DRONE VISUAL DESIGN */
+#bg-drone-container {
+  position: absolute; top: 50%; left: 50%; width: 140px; height: 140px;
+  transform: translate(-50%, -50%); perspective: 1200px;
+  transition: filter 0.3s, transform 0.15s;
+}
+body.targeting #bg-drone-container { filter: brightness(1.2) drop-shadow(0 0 15px var(--yellow-glow)); }
+
+.drone-lock-target {
+  position: absolute; inset: -35px; border: 1px solid rgba(250, 204, 21, 0.1); pointer-events: none;
+  animation: lockRotate 12s infinite linear;
+}
+.lock-corner { position: absolute; width: 15px; height: 15px; border: 2.5px solid var(--yellow); box-shadow: 0 0 10px var(--yellow-glow); }
+.lc-tl { top: -8px; left: -8px; border-right: 0; border-bottom: 0; }
+.lc-tr { top: -8px; right: -8px; border-left: 0; border-bottom: 0; }
+.lc-bl { bottom: -8px; left: -8px; border-right: 0; border-top: 0; }
+.lc-br { bottom: -8px; right: -8px; border-left: 0; border-top: 0; }
+.lock-label {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-family: var(--font-mono); font-size: 9px; font-weight: 900; color: var(--yellow);
+  letter-spacing: 2px; text-align: center; white-space: nowrap;
+  animation: lockReverse 12s infinite linear;
+}
+
+#bg-drone { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.1s ease-out; }
+.drone-arm { position: absolute; width: 60px; height: 5px; top: 50%; left: 50%; transform-origin: 0% 50%; background: #111; border: 1.5px solid #444; }
+.arm-inner { position: absolute; inset: 0; background: linear-gradient(90deg, #111, #555, #111); opacity: 0.8; }
+.motor-mount { position: absolute; right: -8px; top: -8px; width: 16px; height: 16px; background: #000; border: 2.5px solid #555; border-radius: 50%; }
+
+.arm-fl { transform: rotate(-135deg) translate(8px); } .arm-fr { transform: rotate(-45deg) translate(8px); }
+.arm-bl { transform: rotate(135deg) translate(8px); } .arm-br { transform: rotate(45deg) translate(8px); }
+
+.drone-body-main { position: absolute; top: 50%; left: 50%; width: 35px; height: 55px; transform: translate(-50%, -50%); background: #080808; border: 2px solid #666; border-radius: 8px; box-shadow: inset 0 0 10px #000; }
+.drone-core-glow { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; background: var(--yellow); border-radius: 50%; box-shadow: 0 0 15px var(--yellow); }
+
+.drone-prop-unit { position: absolute; width: 70px; height: 70px; transform: translate(-50%, -50%); }
+.prop-blur { 
+  position: absolute; inset: 0; border: 1px solid rgba(255,255,255,0.08); 
+  border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); 
+  animation: propSpin 0.05s infinite linear; 
+}
+@keyframes propSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.p-fl { top: -20px; left: -20px; } .p-fr { top: -20px; left: 160px; }
+.p-bl { top: 160px; left: -20px; } .p-br { top: 160px; left: 160px; }
+
+/* NAVIGATION */
+.side-panel-nav { position: fixed; left: 70px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 1000; }
+.nav-module { position: relative; width: 170px; display: flex; align-items: center; padding: 12px 18px; background: rgba(0,0,0,0.85); border: 1px solid var(--border-dim); transition: 0.3s; }
+.nav-icon { font-family: var(--font-mono); font-size: 11px; color: var(--yellow); margin-right: 15px; opacity: 0.6; }
+.nav-text { font-family: var(--font-tech); font-size: 10px; color: #fff; letter-spacing: 2px; }
+.nav-bar { position: absolute; left: 0; top: 0; height: 0; width: 4px; background: var(--yellow); transition: 0.3s; }
+.nav-module.active, .nav-module:hover { background: rgba(250, 204, 21, 0.1); border-color: var(--yellow); }
+.nav-module.active .nav-bar, .nav-module:hover .nav-bar { height: 100%; }
+
+/* CONTENT VIEWPORT */
+#content-viewport { margin-left: 280px; height: 100vh; position: relative; z-index: 2; pointer-events: none; }
+.tab-content { 
+  position: absolute; inset: 0; display: flex; flex-direction: column; padding: 110px 100px 60px 40px; 
+  opacity: 0; visibility: hidden; transform: translateX(30px); 
+  transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.19, 1, 0.22, 1); 
+  pointer-events: none;
+}
+.tab-content.active { 
+  opacity: 1; visibility: visible; transform: translateX(0); 
+  pointer-events: auto;
+}
+.inner-scroll { width: 100%; height: 100%; overflow-y: auto; padding-right: 30px; }
+
+/* DOSSIER PANEL */
+.dossier-panel { 
+  position: relative; overflow: hidden; transition: 0.4s; border: 1px solid var(--border-dim); background: rgba(255,255,255,0.02);
+}
+.dossier-panel:hover { border-color: var(--yellow); background: rgba(250,204,21,0.04); }
+.profile-img-wrap { position: relative; width: 100%; border-bottom: 1px solid var(--border-dim); }
+.scan-bar { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--yellow); box-shadow: 0 0 10px var(--yellow); animation: dossierScan 4s infinite linear; }
+@keyframes dossierScan { 0% { top: 0; } 100% { top: 100%; } }
+
+/* BLUEPRINT EXPANSION */
+.blueprint-expandable { cursor: pointer; transition: 0.4s; }
+.bp-expanded-data { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.19, 1, 0.22, 1); margin-top: 0; opacity: 0; }
+.blueprint-expandable.expanded .bp-expanded-data { max-height: 250px; margin-top: 15px; opacity: 1; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
+
+/* ISR FEED DASHBOARD */
+.sensor-feed-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 40px; }
+.feed-unit { background: #000; border: 1px solid #222; overflow: hidden; position: relative; }
+.feed-container { position: relative; width: 100%; aspect-ratio: 16/9; background: #080808; }
+.feed-container img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; mix-blend-mode: luminosity; }
+.feed-overlay { position: absolute; inset: 0; padding: 15px; pointer-events: none; font-family: var(--font-mono); color: var(--yellow); }
+.feed-scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: rgba(250,204,21,0.15); box-shadow: 0 0 10px rgba(250,204,21,0.3); animation: feedScan 5s infinite linear; }
+@keyframes feedScan { 0% { top: -2%; } 100% { top: 102%; } }
+
+.overlay-top { display: flex; justify-content: space-between; font-size: 11px; font-weight: 900; }
+.pulse-icon::before { content: ''; display: inline-block; width: 8px; height: 8px; background: red; border-radius: 50%; margin-right: 8px; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.overlay-mid { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.feed-crosshair { width: 40px; height: 40px; border: 1px solid rgba(250,204,21,0.3); position: relative; }
+.feed-crosshair::before, .feed-crosshair::after { content: ''; position: absolute; background: var(--yellow); opacity: 0.5; }
+.feed-crosshair::before { top: 50%; left: -10px; width: 60px; height: 1px; }
+.feed-crosshair::after { left: 50%; top: -10px; width: 1px; height: 60px; }
+
+/* CURSOR RETICLE */
+#cursor-reticle { position: fixed; width: 45px; height: 45px; pointer-events: none; z-index: 10001; transform: translate(-50%, -50%); transition: transform 0.08s ease-out; }
+.reticle-circle { width: 100%; height: 100%; border: 2px solid var(--yellow); border-radius: 50%; box-shadow: 0 0 15px var(--yellow-glow); transition: border-color 0.2s, transform 0.15s; }
+.target-bracket { position: absolute; width: 14px; height: 14px; border: 2px solid #fff; opacity: 0; transition: 0.2s; }
+.tb-tl { top: -12px; left: -12px; border-right: 0; border-bottom: 0; }
+.tb-tr { top: -12px; right: -12px; border-left: 0; border-bottom: 0; }
+.tb-bl { bottom: -12px; left: -12px; border-right: 0; border-top: 0; }
+.tb-br { bottom: -12px; right: -12px; border-left: 0; border-top: 0; }
+body.targeting .target-bracket { opacity: 1; transform: scale(1.1); }
+
+/* MISC HUD */
+.hud-footer-data { position: fixed; bottom: 30px; left: 45px; display: flex; gap: 50px; font-family: var(--font-tech); font-size: 10px; color: var(--yellow); opacity: 0.4; letter-spacing: 4px; }
+.highlight { color: var(--yellow); font-weight: 700; }

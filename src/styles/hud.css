@@ -1,0 +1,174 @@
+:root {
+  font-size: 14px;
+  --yellow: #facc15;
+  --yellow-glow: rgba(250, 204, 21, 0.3);
+  --emerald: #059669;
+  --emerald-glow: rgba(5, 150, 105, 0.2);
+  --red-alert: #dc2626;
+  --bg-dark: #000000;
+  --border-dim: rgba(250, 204, 21, 0.12);
+  --text-main: #f1f5f9;
+  --text-bright: #ffffff;
+  --text-dim: #94a3b8;
+  --font-tech: 'Orbitron', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  cursor: none !important;
+  letter-spacing: 0.02em;
+}
+
+body.pdf-open, 
+body.pdf-open *,
+body.modal-open,
+body.modal-open * {
+  cursor: auto !important;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimized HUD grid — reduced opacity, use will-change for GPU layer */
+.hud-grid {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(250, 204, 21, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(250, 204, 21, 0.04) 1px, transparent 1px);
+  background-size: 160px 160px;
+  z-index: -2;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Scanline — reduced opacity for perf */
+.scanline {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.025) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.03;
+}
+
+/* Unified scanline — GPU-optimized */
+.unified-scanline {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(175, 165, 120, 0.12);
+  z-index: -1;
+  pointer-events: none;
+  animation: unifiedScan 16s linear infinite;
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+
+.unified-scanline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60px;
+  right: 0;
+  background: linear-gradient(to right, 
+    transparent 0%, 
+    rgba(5, 150, 105, 0.015) 40%, 
+    rgba(175, 165, 120, 0.04) 85%, 
+    rgba(175, 165, 120, 0.08) 100%
+  );
+  pointer-events: none;
+}
+
+@keyframes unifiedScan {
+  0% { transform: translateX(-2vw); opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { transform: translateX(102vw); opacity: 0; }
+}
+
+.tech-card {
+  border: 1px solid var(--border-dim);
+  background: #080808; 
+  position: relative;
+  z-index: 10;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.active-green-mode {
+  --yellow: var(--emerald);
+  --yellow-glow: var(--emerald-glow);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.highlight {
+  color: var(--yellow);
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+  font-weight: 600;
+}
+
+h1, h2, h3, h4 {
+  letter-spacing: 0.1em;
+}
+
+/* Panel title consistency */
+.panel-title {
+  font-family: var(--font-tech);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 3px;
+}
+
+/* Corner decoration helper */
+.corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--yellow);
+  opacity: 0.35;
+}
+.ct-l { top: 0; left: 0; border-top: 2px solid; border-left: 2px solid; }
+.ct-r { top: 0; right: 0; border-top: 2px solid; border-right: 2px solid; }
+.cb-l { bottom: 0; left: 0; border-bottom: 2px solid; border-left: 2px solid; }
+.cb-r { bottom: 0; right: 0; border-bottom: 2px solid; border-right: 2px solid; }
+
+/* Uplink glow text helper */
+.uplink-glow-text {
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(250, 204, 21, 0.15);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(250, 204, 21, 0.3);
+}
