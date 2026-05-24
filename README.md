@@ -1,4 +1,4 @@
-# 🛰️ OP_HK_07 // AEROSPACE COMMAND HUD INTERFACE
+# AEROSPACE COMMAND HUD INTERFACE
 > **Tactical Engineering Console & Interactive 3D Flight Systems Portfolio**
 
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)](https://my-portfolio-three-gray-69.vercel.app)
