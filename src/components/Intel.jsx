@@ -10,6 +10,7 @@ const FEEDS = [
   { id: 'cam-04', num: 4, type: 'SAR_RADAR', loc: 'ALT: 450M // HDG: 180 DEG' },
   { id: 'cam-05', num: 5, type: 'MULTISPECTRAL', loc: 'LAT: 18.50 N // LNG: 73.80 E' },
   { id: 'cam-06', num: 6, type: 'LIDAR_POINT', loc: 'ALT: 80M // SPD: 8M/S' },
+  { id: 'cam-07', num: 7, type: 'HYPERSPECTRAL_HD', loc: 'LAT: 18.53 N // LNG: 73.86 E' },
 ];
 
 const FeedImage = ({ feedNum, alt }) => {
