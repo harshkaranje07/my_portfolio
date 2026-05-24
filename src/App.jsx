@@ -10,6 +10,7 @@ import Uplink from './components/Uplink';
 import Drone from './components/Drone';
 import Timeline from './components/Timeline';
 import Intro from './components/Intro';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const NAV_ITEMS = [
   { id: 'hero', label: 'DASHBOARD', icon: <LayoutDashboard size={16} /> },
@@ -205,6 +206,8 @@ const App = () => {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      <SpeedInsights />
 
       <style jsx>{`
         .app-container {
