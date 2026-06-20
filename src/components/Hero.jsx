@@ -1,560 +1,265 @@
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef } from 'react';
 
-// Memoized radar background — generates dots once
-const HomeRadarLayers = React.memo(({ isHomeZone }) => {
-  const targets = useMemo(() => {
-    return Array.from({ length: 80 }).map((_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      isGreen: Math.random() > 0.4,
-      dur: 4 + Math.random() * 4,
-      delay: Math.random() * 5,
-      size: Math.random() * 1.1 + 0.9
-    }));
-  }, []);
+const Hero = ({ isHomeZone, setActiveTab }) => {
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+  const sectionRef = useRef(null);
 
-  return (
-    <div className={`home-hud-bg ${isHomeZone ? 'hud-active-mode' : ''}`}>
-      <div className="radar-base-layer">
-        <div className="radar-grid-full" />
-        <div className="radar-circles-center">
-          <div className="arc arc-1" />
-          <div className="arc arc-2" />
-          <div className="arc arc-3" />
-          <div className="arc arc-4" />
-        </div>
-      </div>
+  const handleMouseMove = (e) => {
+    if (!sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
 
-      <div className="radar-active-layer">
-        <div className="radar-sweep-scanner" />
-        
-        {targets.map(t => (
-          <div
-            key={t.id}
-            className={`radar-dot-pulse ${t.isGreen ? 'dot-green' : 'dot-red'}`}
-            style={{
-              left: `${t.x}%`,
-              top: `${t.y}%`,
-              width: t.size,
-              height: t.size,
-              animationDuration: `${t.dur}s`,
-              animationDelay: `${t.delay}s`
-            }}
-          />
-        ))}
-      </div>
-      
-      <div className="radar-hud-markers">
-        <div className="hud-marker top-left mono">SCAN_MODE: ISR_ACTIVE</div>
-        <div className="hud-marker top-right mono">FREQ: 5.8GHZ_SECURE</div>
-        <div className="hud-marker bottom-left mono">NAV: RTK_GPS_LOCK</div>
-        <div className="hud-marker bottom-right mono">SAT: 14_STR_FIX</div>
-      </div>
+  const handleMouseLeave = () => {
+    // Move the glow far off screen when mouse leaves
+    setMousePos({ x: -1000, y: -1000 });
+  };
 
-      <style jsx>{`
-        .home-hud-bg {
-          position: fixed;
-          inset: 0;
-          z-index: 10;
-          pointer-events: none;
-          background: #000;
-          transition: background 0.8s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-
-        .hud-active-mode {
-          background: radial-gradient(circle at 50% 50%, rgba(5, 150, 105, 0.1) 0%, rgba(0, 0, 0, 1) 80%);
-        }
-
-        .radar-base-layer { 
-          z-index: 1; 
-          position: absolute; 
-          inset: 0; 
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .radar-active-layer { 
-          z-index: 2; 
-          position: absolute; 
-          inset: 0; 
-        }
-
-        .radar-grid-full {
-          position: absolute;
-          inset: 0;
-          background-image: 
-            linear-gradient(rgba(250, 204, 21, 0.035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(250, 204, 21, 0.035) 1px, transparent 1px);
-          background-size: 100px 100px;
-          transition: background-image 0.5s ease;
-        }
-
-        .hud-active-mode .radar-grid-full {
-          background-image: 
-            linear-gradient(rgba(5, 150, 105, 0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(5, 150, 105, 0.06) 1px, transparent 1px);
-        }
-
-        .radar-circles-center {
-          position: relative;
-          width: 100vw;
-          height: 100vw;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .arc {
-          position: absolute;
-          border: 1px solid rgba(250, 204, 21, 0.035);
-          border-radius: 50%;
-          transition: border-color 0.5s ease;
-        }
-
-        .hud-active-mode .arc { border-color: rgba(5, 150, 105, 0.08); }
-
-        .arc-1 { width: 250px; height: 250px; }
-        .arc-2 { width: 550px; height: 550px; }
-        .arc-3 { width: 850px; height: 850px; }
-        .arc-4 { width: 1150px; height: 1150px; }
-
-        .radar-sweep-scanner {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 150vmax;
-          height: 150vmax;
-          background: conic-gradient(from 0deg, rgba(250, 204, 21, 0.06) 0deg, transparent 90deg);
-          transform-origin: center center;
-          opacity: 0.5;
-          animation: sweepRotate 18s infinite linear;
-          transition: background 0.5s ease;
-          pointer-events: none;
-          will-change: transform;
-        }
-
-        .hud-active-mode .radar-sweep-scanner {
-          background: conic-gradient(from 0deg, rgba(5, 150, 105, 0.12) 0deg, transparent 90deg);
-        }
-
-        @keyframes sweepRotate {
-          from { transform: translate(-50%, -50%) rotate(0deg); }
-          to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .radar-dot-pulse {
-          position: absolute;
-          border-radius: 50%;
-          opacity: 0.35;
-          animation: softPulse infinite ease-in-out;
-        }
-
-        .dot-green {
-          background: var(--emerald);
-          box-shadow: 0 0 4px rgba(5, 150, 105, 0.3);
-        }
-        .dot-red {
-          background: var(--red-alert);
-          box-shadow: 0 0 4px rgba(220, 38, 38, 0.3);
-        }
-
-        .hud-active-mode .dot-green {
-          box-shadow: 0 0 5px rgba(5, 150, 105, 0.4);
-        }
-
-        @keyframes softPulse {
-          0%, 100% { opacity: 0.25; transform: scale(0.98); }
-          50% { opacity: 0.7; transform: scale(1.03); }
-        }
-
-        .radar-hud-markers {
-          position: absolute;
-          inset: 50px;
-          pointer-events: none;
-          z-index: 3;
-        }
-
-        .hud-marker {
-          position: absolute;
-          font-size: 8px;
-          letter-spacing: 3px;
-          color: var(--yellow);
-          opacity: 0.25;
-          transition: color 0.5s ease, opacity 0.5s ease;
-        }
-        
-        .hud-active-mode .hud-marker { color: var(--emerald); opacity: 0.5; }
-
-        .top-left { top: 0; left: 0; }
-        .top-right { top: 0; right: 0; }
-        .bottom-left { bottom: 0; left: 0; }
-        .bottom-right { bottom: 0; right: 0; }
-      `}</style>
-    </div>
-  );
-});
-
-HomeRadarLayers.displayName = 'HomeRadarLayers';
-
-const Hero = ({ isHomeZone }) => {
-  const interests = useMemo(() => [
-    { title: "UAVs & Drones", id: "01" },
-    { title: "Avionics", id: "02" },
-    { title: "Autonomous Systems", id: "03" },
-    { title: "IoT", id: "04" }
-  ], []);
-
-  // Glow tracker using refs only — zero re-renders
-  const elementsRef = useRef([]);
-  const glowRafRef = useRef(null);
-  const frameCountRef = useRef(0);
-
-  const registerElement = useCallback((el, id) => {
-    if (el && !elementsRef.current.find(item => item.id === id)) {
-      elementsRef.current.push({ el, id });
-    }
-  }, []);
-
-  useEffect(() => {
-    let lastMousePos = null;
-
-    const calculateGlow = () => {
-      if (!lastMousePos) return;
-      
-      frameCountRef.current++;
-      // Only compute glow every 3rd frame
-      if (frameCountRef.current % 3 !== 0) {
-        glowRafRef.current = requestAnimationFrame(calculateGlow);
-        return;
-      }
-      
-      const { x: clientX, y: clientY } = lastMousePos;
-      const threshold = 150;
-
-      elementsRef.current.forEach(({ el }) => {
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = clientX - cx;
-        const dy = clientY - cy;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < threshold) {
-          const intensity = 1 - (distance / threshold);
-          el.style.filter = `brightness(${1 + (0.1 * intensity)})`;
-          el.style.textShadow = `0 0 ${6 * intensity}px #facc15`;
-        } else {
-          el.style.filter = '';
-          el.style.textShadow = 'none';
-        }
-      });
-
-      glowRafRef.current = null;
-    };
-
-    const handleMove = (e) => {
-      lastMousePos = { x: e.clientX, y: e.clientY };
-      if (!glowRafRef.current) {
-        glowRafRef.current = requestAnimationFrame(calculateGlow);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMove, { passive: true });
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMove);
-      if (glowRafRef.current) cancelAnimationFrame(glowRafRef.current);
-    };
-  }, []);
+  const areasOfInterest = [
+    'UAV Systems', 'Avionics', 'ROS2', 'ArduPilot',
+    'Computer Vision', 'Machine Learning', 'Embedded Systems', 'Jetson Nano',
+    'VTOL Platforms', 'Sensor Fusion', 'IoT', 'AI Systems'
+  ];
 
   return (
-    <div className={`hero-container ${isHomeZone ? 'active-green-mode' : ''}`}>
-      <HomeRadarLayers isHomeZone={isHomeZone} />
+    <section 
+      className="hero-section"
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '4rem 2rem',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}
+    >
       
-      <motion.div 
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.6, ease: [0.19, 1, 0.22, 1] }}
-        className="hero-main-hud"
-      >
-        <div className="hud-floating-text">
-          <div className="hero-top-tag">
-            <span className="mono mission-tag highlight">
-              {isHomeZone ? ">> AIRSPACE_CONTROL // ACTIVE_ISR <<" : "SYSTEM_MONITOR // OPERATOR_SYNC"}
-            </span>
-          </div>
-          
-          <h1 className="hero-title">
-            Harshwardhan Karanje
-          </h1>
+      {/* ══ LAYER 1 — Global Background handles this now ══ */}
 
-          <h2 
-            className="hero-subtitle"
-            ref={(el) => registerElement(el, 'subtitle')}
-          >
-            COMPUTER ENGINEERING STUDENT — PCCOE
-          </h2>
+      {/* ══ LAYER 3 — Centered Content ══ */}
+      <div style={{
+        position: 'relative', 
+        zIndex: 10,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        width: '100%',
+        maxWidth: '800px',
+        margin: '0 auto',
+      }}>
 
-          <div className="interests-hud-section">
-            <h4 
-              className="mono highlight section-label"
-              ref={(el) => registerElement(el, 'section-label')}
-            >
-              AREA OF INTEREST
-            </h4>
-            <div className="interests-list-layout">
-              {interests.map((item) => (
-                <div 
-                  key={item.id}
-                  className="aoi-system-module"
-                >
-                  <div className="aoi-hud-tick" />
-                  <div className="aoi-text-group">
-                    <span 
-                      className="aoi-id mono highlight"
-                      ref={(el) => registerElement(el, `aoi-id-${item.id}`)}
-                    >
-                      [ {item.id} ]
-                    </span>
-                    <span 
-                      className="aoi-label mono"
-                      ref={(el) => registerElement(el, `aoi-${item.id}`)}
-                    >
-                      {item.title}
-                    </span>
-                  </div>
-                </div>
+        {/* ── Name — the hero element ── */}
+        <h1
+          className="hero-name"
+        >
+          HARSHWARDHAN<br />KARANJE
+        </h1>
+
+        {/* Role */}
+        <h2 className="hero-role">
+          Computer Engineering Student
+        </h2>
+
+        {/* Description */}
+        <p style={{
+          fontSize: '1rem',
+          lineHeight: 1.85,
+          color: 'rgba(255,255,255,0.85)',
+          maxWidth: '700px',
+          margin: '0 0 3rem 0',
+        }}>
+          Passionate about UAV Systems, Avionics, Embedded Systems, ROS2, ArduPilot, Computer Vision, Machine Learning, IoT, Jetson Nano, and VTOL Technologies. 
+          <br /><br />
+          Focused on building intelligent aerospace systems through software, electronics, autonomy, and engineering.
+        </p>
+
+        {/* ── Interactive Proximity Container (Interests + Buttons) ── */}
+        <div 
+          ref={sectionRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{ 
+            width: '100%', 
+            position: 'relative',
+            padding: '2rem',
+            /* Pass CSS variables to children for proximity effects */
+            '--mouse-x': `${mousePos.x}px`,
+            '--mouse-y': `${mousePos.y}px`,
+          }}
+        >
+          {/* Localized Proximity Glow Overlay */}
+          <div style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            pointerEvents: 'none',
+            background: `radial-gradient(circle 350px at var(--mouse-x) var(--mouse-y), rgba(250,204,21,0.15) 0%, rgba(250,204,21,0.02) 40%, transparent 100%)`,
+            zIndex: 15,
+            mixBlendMode: 'color-dodge',
+          }} />
+
+          {/* ── Areas of Interest ── */}
+          <div style={{ width: '100%', marginBottom: '3rem', position: 'relative', zIndex: 10 }}>
+            <h3 className="hero-interest-title">
+              AREAS OF INTEREST
+            </h3>
+            
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: '0.8rem',
+              maxWidth: '700px',
+              margin: '0 auto'
+            }}>
+              {areasOfInterest.map((area) => (
+                <span key={area} className="interest-card">
+                  {area}
+                </span>
               ))}
             </div>
           </div>
+
+          {/* ── Buttons ── */}
+          <div style={{
+            display: 'flex',
+            gap: '1.5rem',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            position: 'relative',
+            zIndex: 10
+          }}>
+            <button
+              className="hero-btn-primary"
+              onClick={() => setActiveTab('platforms')}
+            >
+              VIEW PROJECTS
+            </button>
+            
+            <button
+              className="hero-btn-secondary"
+              onClick={() => setActiveTab('contact')}
+            >
+              CONTACT
+            </button>
+          </div>
         </div>
-      </motion.div>
 
-      <style jsx>{`
-        .hero-container {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          width: 100%;
-          overflow: hidden;
-          background: #000;
-        }
+      </div>
 
-        .hero-main-hud {
-          text-align: center;
-          width: 100%;
-          max-width: 1100px;
-          position: relative;
-          z-index: 100;
-        }
-
-        .hud-floating-text {
-          padding: 1.5rem;
-        }
-
-        .hero-top-tag { margin-bottom: 2.5rem; }
-        .mission-tag { 
-          font-size: 0.78rem; 
-          letter-spacing: 0.5rem; 
-          display: block; 
-          opacity: 0.65; 
-          transition: color 0.5s ease, opacity 0.5s ease;
-        }
-
-        .hero-title {
-          font-family: var(--font-tech);
-          font-size: 5rem;
-          font-weight: 900;
-          text-transform: uppercase;
-          line-height: 1;
-          margin-bottom: 1.5rem;
-          color: #fff;
-          text-shadow: 0 0 12px var(--yellow-glow);
-          letter-spacing: -1px;
-          transition: color 0.5s ease, text-shadow 0.6s ease;
-        }
-
-        .active-green-mode .hero-title {
-          color: #16A34A !important; 
-          text-shadow: 0 0 20px var(--emerald), 0 0 8px rgba(250, 204, 21, 0.3);
-        }
-
-        .hero-subtitle {
-          font-family: var(--font-tech);
-          font-size: 1.2rem;
-          letter-spacing: 0.7rem;
-          color: var(--text-dim);
-          text-transform: uppercase;
-          margin-bottom: 8rem;
-          opacity: 0.55;
-          transition: color 0.5s ease, opacity 0.5s ease, letter-spacing 0.5s ease, text-shadow 0.5s ease;
-        }
-
-        .active-green-mode .hero-subtitle {
-          color: #facc15 !important;
-          opacity: 1;
-          letter-spacing: 0.8rem;
-          text-shadow: 0 0 6px rgba(250, 204, 21, 0.25);
-        }
-
-        .section-label {
-          margin-bottom: 3.5rem;
-          font-size: 0.85rem;
-          letter-spacing: 10px;
-          opacity: 0.65;
+      {/* Global Hero Styles */}
+      <style>{`
+        .hero-name {
+          font-family: var(--font-tech, "Inter", sans-serif);
+          font-size: clamp(2.5rem, 6vw, 5.5rem);
           font-weight: 800;
-          transition: color 0.5s ease, opacity 0.5s ease, text-shadow 0.5s ease;
-        }
-
-        .active-green-mode .section-label {
-          color: #facc15 !important;
-          opacity: 1;
-          text-shadow: 0 0 8px rgba(250, 204, 21, 0.35);
-        }
-
-        .interests-list-layout {
-          display: grid;
-          grid-template-columns: repeat(2, 300px);
-          gap: 2.2rem 4rem;
-          justify-content: center;
-        }
-
-        .aoi-system-module {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 1rem;
-          position: relative;
-        }
-
-        .aoi-text-group {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          gap: 1.8rem;
-          width: 100%;
-        }
-
-        .aoi-hud-tick {
-          width: 22px;
-          height: 1px;
-          background: var(--yellow);
-          opacity: 0.25;
-          transition: all 0.4s ease;
-        }
-
-        .active-green-mode .aoi-hud-tick {
-          background: #facc15;
-          opacity: 0.6;
-          box-shadow: 0 0 4px rgba(250, 204, 21, 0.4);
-        }
-
-        .aoi-id { 
-          font-size: 0.75rem;
-          opacity: 0.45; 
-          letter-spacing: 3px; 
-          transition: opacity 0.4s, color 0.4s;
-          min-width: 60px;
-          text-align: left;
-          font-weight: 900;
-        }
-
-        .active-green-mode .aoi-id {
-          color: #facc15 !important;
-          opacity: 1;
-        }
-
-        .aoi-label { 
-          font-size: 0.95rem;
-          letter-spacing: 1px; 
-          color: #fff; 
-          opacity: 0.75; 
-          font-weight: 800;
-          transition: all 0.4s;
-          position: relative;
+          line-height: 1.05;
+          letter-spacing: 0.02em;
+          margin: 0 0 1rem 0;
+          background: linear-gradient(150deg, #ffffff 0%, #FACC15 55%, #B29400 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
           white-space: nowrap;
+          word-break: normal;
+          position: relative;
         }
 
-        .active-green-mode .aoi-label {
-          color: #facc15 !important;
-          opacity: 1;
-          text-shadow: 0 0 6px rgba(250, 204, 21, 0.25);
+        .hero-role {
+          font-family: var(--font-tech, monospace);
+          font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+          font-weight: 400;
+          letter-spacing: 4px;
+          color: #FACC15;
+          margin: 0 0 2rem 0;
+          text-transform: uppercase;
+          position: relative;
         }
 
-        .aoi-label::after {
-          content: '';
-          position: absolute;
-          bottom: -5px;
-          left: 0;
-          width: 0;
-          height: 1px;
-          background: var(--yellow);
-          transition: width 0.4s ease;
+        .hero-interest-title {
+          font-family: monospace;
+          font-size: 0.85rem;
+          color: #FACC15;
+          font-weight: bold;
+          letter-spacing: 3px;
+          margin-bottom: 1.5rem;
+          text-transform: uppercase;
+          position: relative;
+          display: inline-block;
         }
 
-        .active-green-mode .aoi-label::after {
-          background: #facc15;
+        .interest-card {
+          font-family: monospace;
+          font-size: 0.7rem;
+          letter-spacing: 1px;
+          color: rgba(255,255,255,0.9);
+          padding: 0.4rem 0.8rem;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.1);
+          text-transform: uppercase;
+          transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+          cursor: default;
+          position: relative;
+          overflow: hidden;
         }
 
-        .aoi-system-module:hover .aoi-label::after {
-          width: 40px;
+        .interest-card:hover {
+          transform: scale(1.05);
+          border-color: rgba(250,204,21,0.5);
+          color: #FACC15;
+          box-shadow: 0 0 15px rgba(250,204,21,0.15);
+          background: rgba(250,204,21,0.05);
         }
 
-        .aoi-system-module:hover .aoi-hud-tick {
-          width: 40px;
-          background: #facc15;
-          opacity: 0.8;
+        .hero-btn-primary {
+          font-family: monospace;
+          background: rgba(250,204,21,0.12);
+          border: 1px solid rgba(250,204,21,0.8);
+          color: #FACC15;
+          padding: 0.85rem 2.4rem;
+          font-size: 0.78rem; 
+          letter-spacing: 2.5px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
+        }
+        
+        .hero-btn-primary:hover {
+          background: rgba(250,204,21,0.25);
+          box-shadow: 0 0 20px rgba(250,204,21,0.2);
+          transform: translateY(-2px);
         }
 
-        .aoi-system-module:hover .aoi-label {
-          color: #facc15;
-          opacity: 1;
-          text-shadow: 0 0 8px rgba(250, 204, 21, 0.4);
+        .hero-btn-secondary {
+          font-family: monospace;
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.3);
+          color: #fff;
+          padding: 0.85rem 2.4rem;
+          font-size: 0.78rem; 
+          letter-spacing: 2.5px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
         }
 
-        @media (max-width: 1024px) {
-          .hero-title { font-size: 3rem; }
-          .hero-subtitle { font-size: 0.9rem; letter-spacing: 4px; margin-bottom: 5rem; }
-          .interests-list-layout { grid-template-columns: 1fr; gap: 2.5rem; }
-          .aoi-system-module { align-items: center; }
-          .aoi-text-group { justify-content: center; gap: 1.2rem; }
-          .hud-floating-text { padding: 1.5rem 1rem; }
-          .section-label { letter-spacing: 6px; margin-bottom: 2.5rem; }
-        }
-
-        @media (max-width: 768px) {
-          .hero-container { align-items: flex-start; padding-top: 2.5rem; }
-          .hud-floating-text { padding: 1rem 0.5rem; }
-          .hero-top-tag { margin-bottom: 1.2rem; }
-          .mission-tag { font-size: 0.55rem; letter-spacing: 0.25rem; }
-          .hero-title { font-size: 2rem; letter-spacing: -0.5px; margin-bottom: 0.8rem; }
-          .hero-subtitle { font-size: 0.65rem; letter-spacing: 2.5px; margin-bottom: 3rem; }
-          .section-label { font-size: 0.7rem; letter-spacing: 5px; margin-bottom: 2rem; }
-          .interests-list-layout { 
-            grid-template-columns: 1fr 1fr; 
-            gap: 1.5rem 2rem;
-            padding: 0 0.5rem;
-          }
-          .aoi-system-module { align-items: flex-start; }
-          .aoi-text-group { gap: 0.8rem; }
-          .aoi-label { font-size: 0.82rem; white-space: normal; }
-          .aoi-id { font-size: 0.65rem; min-width: 45px; }
-          /* Hide decorative corner radar markers on mobile */
-          .radar-hud-markers { display: none; }
-        }
-
-        @media (max-width: 380px) {
-          .hero-title { font-size: 1.7rem; }
-          .interests-list-layout { grid-template-columns: 1fr; }
+        .hero-btn-secondary:hover {
+          background: rgba(250,204,21,0.05);
+          border-color: #FACC15;
+          color: #FACC15;
+          box-shadow: 0 0 15px rgba(250,204,21,0.1);
+          transform: translateY(-2px);
         }
       `}</style>
-    </div>
+    </section>
   );
 };
 
-export default React.memo(Hero);
+export default Hero;

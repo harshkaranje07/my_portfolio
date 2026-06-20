@@ -128,7 +128,7 @@ const Timeline = () => {
               </div>
 
               <div className="card-cell">
-                <div className="mission-card tech-card">
+                <div className="mission-card tech-card tech-glass-panel">
                   <div className="card-inner">
                     <h4 className="mission-name mono">{m.title}</h4>
                     <div className="mission-meta-strip mono">
@@ -179,7 +179,7 @@ const Timeline = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 20 }}
               transition={{ duration: 0.35, ease: [0.19, 1, 0.22, 1] }}
-              className="engineering-panel tech-card"
+              className="engineering-panel tech-card tech-glass-panel"
             >
               <div className="panel-internal-bg">
                 <div className="panel-grid-lines-static" />
@@ -230,7 +230,7 @@ const Timeline = () => {
                           </div>
 
                           <div className="section-visual-area">
-                            <div className="model-slot tech-card">
+                            <div className="model-slot tech-card tech-glass-panel">
                               <div className="model-placeholder">
                                 <Layers size={36} className="p-icon" />
                                 <span className="mono p-text">{section.modelLabel}</span>
@@ -258,7 +258,7 @@ const Timeline = () => {
           position: relative;
           padding-bottom: 4rem;
           min-height: 100%;
-          background: #000;
+          background: transparent;
         }
 
         .timeline-bg-layer {
@@ -266,7 +266,7 @@ const Timeline = () => {
           inset: 0;
           z-index: 0;
           pointer-events: none;
-          background: #000;
+          background: transparent;
         }
 
         .depth-gradient {
@@ -391,7 +391,7 @@ const Timeline = () => {
 
         .mission-card {
           padding: 2.2rem;
-          background: rgba(8, 8, 8, 0.9);
+          background: transparent;
           transition: transform 0.3s ease, border-color 0.3s ease;
         }
 
@@ -484,7 +484,7 @@ const Timeline = () => {
           width: min(88vw, 1100px);
           height: min(88vh, 900px);
           max-height: calc(100vh - 4rem);
-          background: #080808;
+          background: transparent;
           border: 1px solid rgba(250, 204, 21, 0.15);
           display: flex;
           flex-direction: column;
@@ -625,7 +625,7 @@ const Timeline = () => {
         .model-slot {
           width: 100%;
           aspect-ratio: 1/1;
-          background: #030303;
+          background: transparent;
           border: 1px solid rgba(250, 204, 21, 0.08);
           display: flex;
           align-items: center;

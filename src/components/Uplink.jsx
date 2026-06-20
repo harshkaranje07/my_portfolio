@@ -1,8 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Globe, Linkedin, Github } from 'lucide-react';
+import { Mail, Globe, Linkedin, Github, Radio, ShieldCheck, Activity, Zap, Wifi, Clock } from 'lucide-react';
 
-// Stable session ID — generated once per mount, not on every render
 const SESSION_ID = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
 
 const Uplink = () => {
@@ -10,113 +9,240 @@ const Uplink = () => {
 
   return (
     <div className={`uplink-container ${isRadarHover ? 'active-green-mode' : ''}`}>
-      <h3 className="panel-title">UPLINK_STATION // SAT_COM_07</h3>
+      <div className="uplink-header">
+        <h3 className="panel-title mono">UPLINK_STATION // SAT_COM_07</h3>
+        <p className="mono panel-meta">GROUND_CONTROL_SYSTEM // ID: HK_TMI_07</p>
+      </div>
 
-      <div className="uplink-grid">
+      <div className="dashboard-grid">
+        
+        {/* ========================================= */}
+        {/* RADAR PANEL (Primary Focus)               */}
+        {/* ========================================= */}
         <div 
-          className="radar-station tech-card"
+          className="radar-panel tech-glass-panel"
           onMouseEnter={() => setIsRadarHover(true)}
           onMouseLeave={() => setIsRadarHover(false)}
         >
-          <div className="radar-base">
-            <div className="radar-rings">
-              <div className="ring" /><div className="ring" /><div className="ring" />
-            </div>
-            <motion.div 
-              animate={{ rotate: 360 }}
-              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              className="radar-sweep"
-              style={{ 
-                background: isRadarHover 
-                  ? 'linear-gradient(45deg, rgba(5, 150, 105, 0.2) 0%, transparent 70%)' 
-                  : 'linear-gradient(45deg, rgba(250, 204, 21, 0.12) 0%, transparent 70%)' 
-              }}
-            />
-            <div className="blip b1" />
-            <div className="blip b2" />
-            <div className="blip b3 blip-red" />
+          <div className="panel-header mono">
+            <span className="tick-sm" /> RADAR_TRACKING // AIRSPACE_MONITOR
           </div>
+
+          <div className="radar-wrapper">
+            <div className="radar-base">
+              <div className="radar-rings">
+                <div className="ring" />
+                <div className="ring" />
+                <div className="ring" />
+                <div className="ring" />
+                <div className="crosshair-h" />
+                <div className="crosshair-v" />
+              </div>
+
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                className="radar-sweep"
+              />
+
+              <div className="blip b1" />
+              <div className="blip b2" />
+              <div className="blip b3 blip-red" />
+            </div>
+          </div>
+          
           <div className={`radar-telemetry mono highlight ${isRadarHover ? 'glow-text-green' : ''}`}>
             {isRadarHover ? "AIRSPACE_LOCKED_SECURE" : "LINK_STATUS: STABLE // ENCRYPTION: AES_256"}
           </div>
         </div>
 
-        <div className="contact-terminal tech-card">
-          <div className="terminal-header mono">UPLINK_TERMINAL_v4.5</div>
-          <div className="terminal-body">
-            <div className="mono operator-id">
-              <span className="uplink-glow-text highlight"> HARSHWARDHAN_KARANJE</span>
-              {' '}// ID: HK_TMI_07
+        {/* ========================================= */}
+        {/* TELEMETRY STATUS PANEL                    */}
+        {/* ========================================= */}
+        <div className="status-panel tech-glass-panel">
+          <div className="panel-header mono">
+            <span className="tick-sm" /> TELEMETRY_DATA
+          </div>
+          
+          <div className="status-grid">
+            <div className="status-item">
+              <Wifi size={14} className="status-icon" />
+              <div className="status-text">
+                <span className="mono lbl">LINK STATUS</span>
+                <span className="mono val good">STABLE</span>
+              </div>
             </div>
-            
-            <div className="channel-list">
-              <a href="mailto:karanjeharshwardhan@gmail.com" className="chan-btn tech-card">
-                <Mail size={15} className="highlight" />
-                <div className="chan-text">
-                  <span className="mono chan-proto">DIRECT_LINK_PROTO_SMTP</span>
-                  <span className="mono uplink-glow-text chan-val">karanjeharshwardhan@gmail.com</span>
-                </div>
-              </a>
-
-              <a href="https://www.teammaverickindia.com/" target="_blank" rel="noopener noreferrer" className="chan-btn tech-card">
-                <Globe size={15} className="highlight" />
-                <div className="chan-text">
-                  <span className="mono chan-proto">ORGANIZATION_EXTERNAL</span>
-                  <span className="mono uplink-glow-text chan-val">TEAM MAVERICK INDIA</span>
-                </div>
-              </a>
-
-              <div className="social-row">
-                <a href="https://www.linkedin.com/in/harshwardhankaranje/" target="_blank" rel="noopener noreferrer" className="soc-link tech-card uplink-glow-text"><Linkedin size={17} /></a>
-                <a href="https://github.com/harshkaranje07" target="_blank" rel="noopener noreferrer" className="soc-link tech-card uplink-glow-text"><Github size={17} /></a>
+            <div className="status-item">
+              <ShieldCheck size={14} className="status-icon" />
+              <div className="status-text">
+                <span className="mono lbl">ENCRYPTION</span>
+                <span className="mono val">AES-256</span>
+              </div>
+            </div>
+            <div className="status-item">
+              <Activity size={14} className="status-icon" />
+              <div className="status-text">
+                <span className="mono lbl">SIGNAL QUALITY</span>
+                <span className="mono val good">OPTIMAL</span>
+              </div>
+            </div>
+            <div className="status-item">
+              <Radio size={14} className="status-icon" />
+              <div className="status-text">
+                <span className="mono lbl">TELEMETRY</span>
+                <span className="mono val good">ACTIVE</span>
+              </div>
+            </div>
+            <div className="status-item">
+              <Zap size={14} className="status-icon" />
+              <div className="status-text">
+                <span className="mono lbl">PACKET LOSS</span>
+                <span className="mono val">0.00%</span>
+              </div>
+            </div>
+            <div className="status-item">
+              <Clock size={14} className="status-icon" />
+              <div className="status-text">
+                <span className="mono lbl">LATENCY</span>
+                <span className="mono val">12ms</span>
               </div>
             </div>
           </div>
-          <div className={`terminal-footer mono highlight ${isRadarHover ? 'glow-text-green' : ''}`}>
-            UPLINK_ESTABLISHED_HK07_SESSION_ID_{SESSION_ID}
+        </div>
+
+        {/* ========================================= */}
+        {/* SECURE COMM CHANNELS (Contact Info)       */}
+        {/* ========================================= */}
+        <div className="comm-panel tech-glass-panel">
+          <div className="panel-header mono">
+            <span className="tick-sm" /> SECURE_COMM_CHANNELS
+          </div>
+          
+          <div className="channel-list">
+            <a href="mailto:karanjeharshwardhan@gmail.com" className="chan-btn">
+              <Mail size={16} className="highlight" />
+              <div className="chan-text">
+                <span className="mono chan-proto">DIRECT_LINK_PROTO_SMTP</span>
+                <span className="mono chan-val">karanjeharshwardhan@gmail.com</span>
+              </div>
+            </a>
+
+            <a href="https://www.teammaverickindia.com/" target="_blank" rel="noopener noreferrer" className="chan-btn">
+              <Globe size={16} className="highlight" />
+              <div className="chan-text">
+                <span className="mono chan-proto">ORGANIZATION_EXTERNAL</span>
+                <span className="mono chan-val">TEAM MAVERICK INDIA</span>
+              </div>
+            </a>
+
+            <div className="social-row">
+              <a href="https://www.linkedin.com/in/harshwardhankaranje/" target="_blank" rel="noopener noreferrer" className="soc-link"><Linkedin size={18} /></a>
+              <a href="https://github.com/harshkaranje07" target="_blank" rel="noopener noreferrer" className="soc-link"><Github size={18} /></a>
+            </div>
+          </div>
+          
+          <div className="terminal-footer mono">
+            SESSION_ID_{SESSION_ID} // LINK_ESTABLISHED
           </div>
         </div>
+
       </div>
 
       <style jsx>{`
         .uplink-container { 
           padding-bottom: 4rem; 
-          transition: all 0.5s ease; 
-        }
-        
-        .uplink-grid { 
-          display: grid; 
-          grid-template-columns: 1.1fr 1fr; 
-          gap: 3.5rem; 
-          align-items: center; 
-          margin-top: 2.5rem;
         }
 
-        .radar-station { 
-          display: flex; 
-          flex-direction: column; 
-          align-items: center; 
-          gap: 2.5rem; 
-          padding: 3.5rem; 
-          background: #000; 
-          position: relative; 
-          cursor: crosshair !important;
-          transition: border-color 0.4s ease, background 0.4s ease;
-          border-color: var(--border-dim);
+        .uplink-header {
+          margin-bottom: 2.5rem;
         }
-        .radar-station:hover { 
-          border-color: rgba(5, 150, 105, 0.28); 
-          background: rgba(5, 150, 105, 0.03); 
+
+        .panel-meta {
+          font-size: 0.65rem;
+          opacity: 0.4;
+          letter-spacing: 3px;
+          margin-top: 0.5rem;
+        }
+
+        .dashboard-grid { 
+          display: grid; 
+          grid-template-columns: 1fr 340px; 
+          grid-template-rows: auto auto;
+          gap: 2rem; 
+          align-items: start;
+        }
+
+        @media (max-width: 1024px) { 
+          .dashboard-grid { 
+            grid-template-columns: 1fr; 
+          }
+        }
+
+        /* ------------------------------------- */
+        /* COMMON PANEL HEADER                   */
+        /* ------------------------------------- */
+        .panel-header {
+          padding: 1.2rem 1.5rem;
+          border-bottom: 1px solid rgba(250, 204, 21, 0.1);
+          font-size: 0.7rem;
+          letter-spacing: 2px;
+          color: var(--text-dim);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(0,0,0,0.2);
+        }
+
+        .tick-sm {
+          display: inline-block;
+          width: 3px;
+          height: 10px;
+          background: var(--yellow);
+        }
+
+        /* ------------------------------------- */
+        /* RADAR PANEL                           */
+        /* ------------------------------------- */
+        .radar-panel {
+          grid-column: 1;
+          grid-row: 1 / 3;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          min-height: 600px;
+        }
+
+        @media (max-width: 1024px) { 
+          .radar-panel {
+            grid-row: auto;
+            min-height: 500px;
+          }
+        }
+
+        .radar-wrapper {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+          position: relative;
         }
 
         .radar-base { 
           position: relative; 
-          width: 260px; 
-          height: 260px; 
-          border: 1px solid rgba(255,255,255,0.04); 
+          width: 400px; 
+          height: 400px; 
+          border: 1px solid rgba(250, 204, 21, 0.2); 
           border-radius: 50%; 
           overflow: hidden; 
-          background: radial-gradient(circle, rgba(250, 204, 21, 0.025) 0%, transparent 80%); 
+          background: radial-gradient(circle, rgba(250, 204, 21, 0.05) 0%, transparent 70%); 
+        }
+
+        @media (max-width: 600px) {
+          .radar-base {
+            width: 300px;
+            height: 300px;
+          }
         }
         
         .radar-rings .ring { 
@@ -124,12 +250,31 @@ const Uplink = () => {
           top: 50%; 
           left: 50%; 
           transform: translate(-50%, -50%); 
-          border: 1px solid rgba(255,255,255,0.025); 
+          border: 1px solid rgba(250, 204, 21, 0.08); 
           border-radius: 50%; 
         }
-        .ring:nth-child(1) { width: 33%; height: 33%; }
-        .ring:nth-child(2) { width: 66%; height: 66%; }
-        .ring:nth-child(3) { width: 100%; height: 100%; }
+        .ring:nth-child(1) { width: 25%; height: 25%; }
+        .ring:nth-child(2) { width: 50%; height: 50%; }
+        .ring:nth-child(3) { width: 75%; height: 75%; }
+        .ring:nth-child(4) { width: 100%; height: 100%; }
+
+        .crosshair-h {
+          position: absolute;
+          top: 50%;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: rgba(250, 204, 21, 0.08);
+        }
+        
+        .crosshair-v {
+          position: absolute;
+          left: 50%;
+          top: 0;
+          bottom: 0;
+          width: 1px;
+          background: rgba(250, 204, 21, 0.08);
+        }
         
         .radar-sweep { 
           position: absolute; 
@@ -138,118 +283,184 @@ const Uplink = () => {
           width: 50%; 
           height: 50%; 
           transform-origin: 0% 0%; 
+          background: linear-gradient(45deg, rgba(250, 204, 21, 0.15) 0%, transparent 60%);
           will-change: transform;
         }
         
         .blip { 
           position: absolute; 
-          width: 5px; 
-          height: 5px; 
+          width: 6px; 
+          height: 6px; 
           border-radius: 50%; 
-          background: var(--emerald); 
-          box-shadow: 0 0 5px var(--emerald-glow); 
+          background: var(--yellow); 
+          box-shadow: 0 0 8px var(--yellow-glow); 
         }
-        .blip-red { background: #ef4444; box-shadow: 0 0 5px rgba(239, 68, 68, 0.35); }
-        .b1 { top: 30%; left: 60%; } 
-        .b2 { top: 70%; left: 40%; } 
-        .b3 { top: 40%; left: 30%; }
+        .blip-red { 
+          background: #ef4444; 
+          box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); 
+        }
+        .b1 { top: 25%; left: 65%; } 
+        .b2 { top: 70%; left: 35%; } 
+        .b3 { top: 40%; left: 25%; }
         
         .radar-telemetry { 
           font-size: 0.65rem; 
-          letter-spacing: 2.5px; 
-          font-weight: 700; 
+          letter-spacing: 2px; 
           text-align: center;
+          padding: 1.5rem;
+          border-top: 1px solid rgba(250, 204, 21, 0.1);
+          color: var(--text-dim);
+          background: rgba(0,0,0,0.2);
         }
 
-        .contact-terminal { padding: 0; overflow: hidden; border-color: var(--border-dim); }
-        
-        .terminal-header { 
-          padding: 0.9rem 1.6rem; 
-          background: #111; 
-          font-size: 0.65rem; 
-          color: var(--yellow); 
-          border-bottom: 1px solid var(--border-dim); 
-          font-weight: 800; 
+        /* ------------------------------------- */
+        /* STATUS PANEL                          */
+        /* ------------------------------------- */
+        .status-panel {
+          grid-column: 2;
+          grid-row: 1;
         }
-        
-        .terminal-body { padding: 2.5rem 2rem; }
-        
-        .operator-id {
-          margin-bottom: 2.2rem;
+
+        .status-grid {
+          padding: 1.5rem;
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.2rem;
+        }
+
+        .status-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .status-icon {
+          color: var(--yellow);
+          opacity: 0.8;
+        }
+
+        .status-text {
+          display: flex;
+          flex-direction: column;
+          gap: 0.2rem;
+        }
+
+        .status-text .lbl {
+          font-size: 0.55rem;
+          color: var(--text-dim);
+          letter-spacing: 1px;
+        }
+
+        .status-text .val {
           font-size: 0.8rem;
-          font-weight: 700;
+          color: #fff;
+          font-weight: 600;
+          letter-spacing: 1px;
         }
-        
-        .channel-list { display: flex; flex-direction: column; gap: 1.2rem; }
+
+        .status-text .val.good {
+          color: var(--yellow);
+        }
+
+        /* ------------------------------------- */
+        /* COMM PANEL (Contact Links)            */
+        /* ------------------------------------- */
+        .comm-panel {
+          grid-column: 2;
+          grid-row: 2;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .channel-list { 
+          padding: 1.5rem;
+          display: flex; 
+          flex-direction: column; 
+          gap: 1rem; 
+        }
         
         .chan-btn { 
           display: flex; 
           align-items: center; 
-          gap: 1.3rem; 
+          gap: 1rem; 
           padding: 1rem; 
           text-decoration: none; 
-          color: #fff; 
-          transition: border-color 0.3s ease, background 0.3s ease; 
-          border-color: rgba(255,255,255,0.04); 
+          background: rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.05); 
+          transition: all 0.3s ease; 
         }
+
         .chan-btn:hover { 
-          border-color: rgba(5, 150, 105, 0.35); 
-          background: rgba(5, 150, 105, 0.04); 
+          border-color: rgba(250, 204, 21, 0.3); 
+          background: rgba(250, 204, 21, 0.05); 
+        }
+
+        .chan-btn .highlight {
+          color: var(--yellow);
         }
         
-        .chan-text { display: flex; flex-direction: column; gap: 0.25rem; }
-        .chan-proto { font-size: 0.55rem; opacity: 0.38; letter-spacing: 2px; }
-        .chan-val { font-size: 0.88rem; font-weight: 700; }
+        .chan-text { 
+          display: flex; 
+          flex-direction: column; 
+          gap: 0.25rem; 
+        }
+
+        .chan-proto { 
+          font-size: 0.55rem; 
+          color: var(--text-dim);
+          letter-spacing: 1px; 
+        }
+
+        .chan-val { 
+          font-size: 0.8rem; 
+          color: #fff;
+          font-weight: 600; 
+        }
         
-        .social-row { display: flex; gap: 1.2rem; }
+        .social-row { 
+          display: flex; 
+          gap: 1rem; 
+        }
+
         .soc-link { 
           flex: 1; 
           display: flex; 
           justify-content: center; 
           padding: 0.9rem; 
-          color: var(--text-dim); 
-          transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease; 
-          border-color: rgba(255,255,255,0.04); 
+          color: var(--yellow); 
+          background: rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.05); 
+          transition: all 0.3s ease; 
           text-decoration: none;
         }
+
         .soc-link:hover { 
-          color: var(--emerald); 
-          border-color: var(--emerald); 
-          background: rgba(5, 150, 105, 0.04); 
+          color: #fff;
+          border-color: rgba(250, 204, 21, 0.3); 
+          background: rgba(250, 204, 21, 0.05); 
         }
         
         .terminal-footer { 
-          padding: 0.9rem; 
+          margin-top: auto;
+          padding: 1.2rem; 
           text-align: center; 
-          border-top: 1px solid var(--border-dim); 
+          border-top: 1px solid rgba(250, 204, 21, 0.1); 
           font-size: 0.6rem; 
-          letter-spacing: 2.5px; 
-          opacity: 0.55; 
+          letter-spacing: 2px; 
+          color: var(--text-dim);
+          background: rgba(0,0,0,0.2);
         }
 
-        .active-green-mode .highlight { color: var(--emerald); }
+        /* ------------------------------------- */
+        /* ACTIVE GREEN MODE (Subtle handling)   */
+        /* ------------------------------------- */
+        .active-green-mode .radar-sweep {
+          background: linear-gradient(45deg, rgba(16, 185, 129, 0.15) 0%, transparent 60%);
+        }
+        
         .glow-text-green { 
-          text-shadow: 0 0 6px var(--emerald-glow); 
           color: var(--emerald) !important; 
-        }
-
-        @media (max-width: 1024px) { 
-          .uplink-grid { grid-template-columns: 1fr; }
-          .radar-base { width: 220px; height: 220px; }
-          .radar-station { padding: 2.5rem; }
-        }
-
-        @media (max-width: 768px) {
-          .uplink-grid { gap: 2rem; }
-          /* Hide radar on mobile to keep it clean */
-          .radar-station { display: none; }
-          .contact-terminal { border: 1px solid var(--border-dim); }
-          .terminal-body { padding: 1.8rem 1.2rem; }
-          .chan-btn { padding: 1.2rem; gap: 1rem; }
-          .chan-val { font-size: 0.78rem; }
-          .soc-link { padding: 1.2rem; font-size: 1rem; }
-          .social-row { gap: 0.8rem; }
-          .operator-id { font-size: 0.72rem; margin-bottom: 1.5rem; }
+          text-shadow: 0 0 6px rgba(16, 185, 129, 0.4); 
         }
       `}</style>
     </div>

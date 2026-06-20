@@ -9,8 +9,10 @@
   "preview": "vite preview"
  },
  "dependencies": {
+  "@paper-design/shaders-react": "^0.0.76",
   "@react-three/drei": "^9.88.14",
   "@react-three/fiber": "^8.15.12",
+  "@splinetool/react-spline": "^4.1.0",
   "@vercel/speed-insights": "^2.0.0",
   "framer-motion": "^11.0.0",
   "lucide-react": "^0.563.0",

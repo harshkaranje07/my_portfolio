@@ -56,6 +56,13 @@ const Intro = ({ onComplete }) => {
   return (
     <div className="intro-screen">
       <div className="pure-black-base" />
+      
+      {/* New Cinematic Aerospace Atmosphere */}
+      <div className="intro-atmosphere" />
+      <div className="intro-radar-rings" />
+      <div className="text-glow-anchor" />
+      <div className="intro-vignette" />
+
       <div className="avionics-scan-overlay" />
       
       <div className="intro-center-anchor">
@@ -123,7 +130,7 @@ const Intro = ({ onComplete }) => {
         .intro-screen {
           position: fixed;
           inset: 0;
-          background: #000;
+          background: transparent;
           z-index: 100000;
           display: flex;
           align-items: center;
@@ -132,11 +139,69 @@ const Intro = ({ onComplete }) => {
         }
 
         .pure-black-base {
+          display: none;
+        }
+
+        /* ── New Atmosphere Styles ── */
+        .intro-atmosphere {
           position: absolute;
           inset: 0;
-          background: #000;
-          z-index: 1;
+          z-index: 2;
+          background: 
+            radial-gradient(ellipse at 50% 50%, rgba(250,204,21,0.03) 0%, transparent 60%),
+            linear-gradient(rgba(250,204,21,0.015) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(250,204,21,0.015) 1px, transparent 1px);
+          background-size: 100% 100%, 60px 60px, 60px 60px;
+          animation: atmosphericDrift 30s linear infinite;
         }
+
+        .intro-radar-rings {
+          position: absolute;
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          width: 800px; height: 800px;
+          border-radius: 50%;
+          border: 1px solid rgba(250,204,21,0.02);
+          box-shadow: inset 0 0 40px rgba(250,204,21,0.01), 0 0 40px rgba(250,204,21,0.01);
+          z-index: 2;
+          pointer-events: none;
+        }
+        
+        .intro-radar-rings::after {
+          content: '';
+          position: absolute;
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          width: 1200px; height: 1200px;
+          border-radius: 50%;
+          border: 1px solid rgba(250,204,21,0.015);
+        }
+
+        .text-glow-anchor {
+          position: absolute;
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          width: 600px; height: 300px;
+          background: radial-gradient(circle at 50% 50%, rgba(250,204,21,0.08), transparent 70%);
+          filter: blur(20px);
+          z-index: 3;
+          pointer-events: none;
+        }
+        
+        .intro-vignette {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.85) 100%);
+          z-index: 4;
+          pointer-events: none;
+        }
+
+        @keyframes atmosphericDrift {
+          0% { background-position: 0 0, 0 0, 0 0; }
+          100% { background-position: 0 0, 60px 60px, 60px 60px; }
+        }
+
+        /* ── End New Atmosphere Styles ── */
 
         .avionics-scan-overlay {
           position: absolute;
@@ -146,7 +211,7 @@ const Intro = ({ onComplete }) => {
             rgba(255, 255, 255, 0.01) 50%
           );
           background-size: 100% 4px;
-          z-index: 2;
+          z-index: 5;
           pointer-events: none;
           opacity: 0.25;
         }

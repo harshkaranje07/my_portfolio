@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, User, History, ShieldAlert, Target, Radio } from 'lucide-react';
+import { LayoutDashboard, User, History, ShieldAlert, Target, Radio, Menu, X } from 'lucide-react';
 import Hero from './components/Hero';
 import Operative from './components/Operative';
 import Arsenal from './components/Arsenal';
@@ -11,12 +11,13 @@ import Drone from './components/Drone';
 import Timeline from './components/Timeline';
 import Intro from './components/Intro';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { GradientBackground } from './components/ui/paper-design-shader-background';
 
 const NAV_ITEMS = [
   { id: 'hero', label: 'DASHBOARD', icon: <LayoutDashboard size={16} /> },
   { id: 'about', label: 'OPERATIVE', icon: <User size={16} /> },
   { id: 'timeline', label: 'MISSION LOG', icon: <History size={16} /> },
-  { id: 'platforms', label: 'ARSENAL', icon: <ShieldAlert size={16} /> },
+  { id: 'platforms', label: 'PROJECTS', icon: <ShieldAlert size={16} /> },
   { id: 'intel', label: 'INTEL', icon: <Target size={16} /> },
   { id: 'contact', label: 'UPLINK', icon: <Radio size={16} /> },
 ];
@@ -28,6 +29,7 @@ const App = () => {
   const [isDimmed, setIsDimmed] = useState(false);
   const [showSweep, setShowSweep] = useState(false);
   const [isUILoaded, setIsUILoaded] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const prevTabRef = useRef(activeTab);
 
   const handleBootComplete = useCallback(() => setIsBooting(false), []);
@@ -111,12 +113,43 @@ const App = () => {
     };
   }, [activeTab, isBooting]);
 
-  if (isBooting) {
-    return <Intro onComplete={handleBootComplete} />;
-  }
+  const getAtmosphereConfig = () => {
+    if (isBooting) {
+      // Intro
+      return { colors: ["#050505", "#111111", "#FACC15", "#D4A017", "#B8860B"], blur: "20px", opacity: 0.35, speed: 0.3 };
+    }
+    switch (activeTab) {
+      case 'hero': 
+        // Home: Untouched
+        return { colors: ["#FACC15", "#D4A017", "#FFE08A", "#111111", "#000000"], blur: "0px", opacity: 1.0, speed: 1 };
+      case 'about': 
+        // Operative
+        return { colors: ["#050505", "#000000", "#111111", "#B8860B", "#FACC15"], blur: "20px", opacity: 0.65, speed: 0.4 };
+      case 'timeline': 
+        // Mission Log
+        return { colors: ["#050505", "#050505", "#111111", "#B8860B", "#D4A017"], blur: "25px", opacity: 0.6, speed: 0.2 };
+      case 'platforms': 
+        // Projects
+        return { colors: ["#000000", "#050505", "#111111", "#FACC15", "#D4A017"], blur: "20px", opacity: 0.6, speed: 0.4 };
+      case 'intel': 
+        // Intel
+        return { colors: ["#050505", "#000000", "#111111", "#D4A017", "#B8860B"], blur: "30px", opacity: 0.55, speed: 0.3 };
+      case 'contact': 
+        // Contact
+        return { colors: ["#000000", "#111111", "#B8860B", "#FACC15", "#D4A017"], blur: "25px", opacity: 0.65, speed: 0.3 };
+      default: 
+        return { colors: ["#050505", "#111111", "#FACC15", "#D4A017", "#000000"], blur: "20px", opacity: 0.6, speed: 0.3 };
+    }
+  };
 
   return (
-    <div className={`app-container ${isDimmed ? 'dimmed-state' : ''} ${isHomeZone && activeTab === 'hero' ? 'home-active' : ''}`}>
+    <>
+      <GradientBackground {...getAtmosphereConfig()} />
+      {isBooting ? (
+        <Intro onComplete={handleBootComplete} />
+      ) : (
+        <div className={`app-container ${isDimmed ? 'dimmed-state' : ''} ${isHomeZone && activeTab === 'hero' ? 'home-active' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+      <div className="global-haze" />
       <div className="hud-grid" />
       <div className="scanline-sweep" />
       <div className="scanline" />
@@ -135,7 +168,17 @@ const App = () => {
         )}
       </AnimatePresence>
 
-      <Drone activeTab={activeTab} isHomeZone={isHomeZone && activeTab === 'hero'} isOffline={!isUILoaded} />
+      <Drone isOffline={!isUILoaded} />
+
+      {/* Sidebar Toggle Button */}
+      {isUILoaded && (
+        <button 
+          className="sidebar-toggle-btn"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      )}
 
       {/* UI Elements */}
       <AnimatePresence>
@@ -154,14 +197,16 @@ const App = () => {
               <div className="status-item mono team-branding">WOLVES_OF_THE_SKY // TMI</div>
             </header>
 
-            <nav className="nav-sidebar">
-              <div className="nav-header mono"> MISSION_CONTROL</div>
+            <nav className={`nav-sidebar ${isSidebarOpen ? 'open' : ''}`}>
               <div className="nav-group">
                 {NAV_ITEMS.map((item) => (
                   <button
                     key={item.id}
                     className={`nav-btn ${activeTab === item.id ? 'active' : ''}`}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      if (window.innerWidth <= 1024) setIsSidebarOpen(false);
+                    }}
                   >
                     <div className="nav-icon">{item.icon}</div>
                     <span className="nav-label">{item.label}</span>
@@ -197,7 +242,7 @@ const App = () => {
             transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
             className="tab-container"
           >
-            {activeTab === 'hero' && <Hero isHomeZone={isHomeZone} />}
+            {activeTab === 'hero' && <Hero isHomeZone={isHomeZone} setActiveTab={setActiveTab} />}
             {activeTab === 'about' && <Operative />}
             {activeTab === 'timeline' && <Timeline />}
             {activeTab === 'platforms' && <Arsenal />}
@@ -228,7 +273,7 @@ const App = () => {
           display: flex;
           height: 100vh;
           width: 100vw;
-          background: #000;
+          background: transparent;
           position: relative;
           transition: filter 0.3s ease;
           overflow: hidden;
@@ -236,6 +281,25 @@ const App = () => {
 
         .app-container.dimmed-state {
           filter: brightness(0.1) contrast(1.1);
+        }
+
+        .global-haze {
+          position: fixed;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+          background: 
+            radial-gradient(ellipse at 30% 40%, rgba(250, 204, 21, 0.035) 0%, transparent 60%),
+            radial-gradient(ellipse at 70% 60%, rgba(212, 160, 23, 0.025) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 80%, rgba(255, 224, 138, 0.015) 0%, transparent 70%);
+          filter: blur(40px);
+          animation: hazeShift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes hazeShift {
+          0% { transform: scale(1) translate(0, 0); opacity: 0.7; }
+          50% { transform: scale(1.1) translate(-2%, 2%); opacity: 1; }
+          100% { transform: scale(1.05) translate(2%, -2%); opacity: 0.8; }
         }
 
         .sweep-overlay {
@@ -273,8 +337,11 @@ const App = () => {
           justify-content: space-between;
           align-items: center;
           padding: 0 2rem;
-          background: rgba(5, 5, 5, 0.92);
-          border-bottom: 1px solid var(--border-dim);
+          background: rgba(10, 10, 10, 0.55);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(250, 204, 21, 0.15);
+          box-shadow: 0 1px 15px rgba(250, 204, 21, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.05);
           z-index: 1100;
           font-size: 0.7rem;
           letter-spacing: 2px;
@@ -283,8 +350,8 @@ const App = () => {
         }
 
         .home-active .status-bar {
-          background: rgba(4, 12, 8, 0.95);
-          border-color: rgba(16, 185, 129, 0.2);
+          background: rgba(4, 12, 8, 0.55);
+          border-color: rgba(16, 185, 129, 0.15);
         }
 
         .dot-led {
@@ -301,25 +368,54 @@ const App = () => {
         @keyframes blink { 50% { opacity: 0.3; } }
 
         /* Left Dashboard Panel (Mission Control) */
+        .sidebar-toggle-btn {
+          position: fixed;
+          top: 60px;
+          left: 1.5rem;
+          z-index: 1000;
+          background: rgba(10, 10, 10, 0.8);
+          border: 1px solid rgba(250, 204, 21, 0.3);
+          color: var(--yellow);
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border-radius: 4px;
+        }
+
+        .sidebar-toggle-btn:hover {
+          background: rgba(250, 204, 21, 0.1);
+          box-shadow: 0 0 12px rgba(250, 204, 21, 0.2);
+        }
+
         .nav-sidebar {
           position: fixed;
           left: 0;
           top: 40px;
           bottom: 0;
           width: 230px;
+          background: rgba(8, 8, 8, 0.60);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border-right: 1px solid rgba(250, 204, 21, 0.15);
           display: flex;
           flex-direction: column;
-          padding: 2.5rem 1.2rem;
-          background: rgba(8, 8, 8, 0.85);
-          backdrop-filter: blur(6px);
-          border-right: 1px solid var(--border-dim);
-          z-index: 1000;
-          transition: background 0.4s ease, border-color 0.4s ease;
+          padding: 2.5rem 1.5rem;
+          z-index: 100;
+          transform: translateX(-100%);
+          transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .nav-sidebar.open {
+          transform: translateX(0);
         }
 
         .home-active .nav-sidebar {
-          background: rgba(4, 15, 8, 0.75);
-          border-right: 1px solid rgba(16, 185, 129, 0.25);
+          background: rgba(4, 15, 8, 0.60);
+          border-right: 1px solid rgba(16, 185, 129, 0.15);
         }
 
         .nav-header { 
@@ -336,7 +432,7 @@ const App = () => {
           opacity: 0.8;
         }
 
-        .nav-group { display: flex; flex-direction: column; gap: 0.6rem; flex: 1; }
+        .nav-group { display: flex; flex-direction: column; gap: 0.6rem; flex: 1; margin-top: 3.5rem; }
         
         .nav-btn {
           position: relative;
@@ -344,8 +440,9 @@ const App = () => {
           align-items: center;
           gap: 1rem;
           padding: 0.9rem;
-          background: transparent;
-          border: 1px solid transparent;
+          background: rgba(20, 20, 20, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.03);
+          border-radius: 6px;
           color: var(--text-dim);
           font-family: var(--font-tech);
           font-size: 0.68rem;
@@ -355,19 +452,30 @@ const App = () => {
           text-align: left;
         }
 
-        .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-btn:hover { 
+          color: #fff; 
+          background: rgba(40, 40, 40, 0.5);
+          border-color: rgba(255, 255, 255, 0.1);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
         
         .home-active .nav-btn:hover {
           color: var(--emerald);
           background: rgba(16, 185, 129, 0.08);
         }
 
-        .nav-btn.active { color: var(--yellow); border-color: rgba(250, 204, 21, 0.2); background: rgba(250, 204, 21, 0.06); }
+        .nav-btn.active { 
+          color: #FACC15; 
+          background: rgba(250, 204, 21, 0.12);
+          border-color: rgba(250, 204, 21, 0.3);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 15px rgba(250, 204, 21, 0.18);
+        }
         
         .home-active .nav-btn.active {
           color: var(--emerald);
           border-color: rgba(16, 185, 129, 0.3);
           background: rgba(16, 185, 129, 0.12);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 15px rgba(16, 185, 129, 0.18);
         }
 
         .nav-glow { 
@@ -395,20 +503,25 @@ const App = () => {
 
         .content-area {
           flex: 1;
-          margin-left: 230px;
+          margin-left: 0;
           margin-top: 40px;
-          padding: 3rem;
+          padding: 3rem 3rem 3rem 5rem;
           height: calc(100vh - 40px);
           overflow-y: auto;
+          transition: margin-left 0.4s cubic-bezier(0.19, 1, 0.22, 1), filter 0.3s ease;
+        }
+
+        .sidebar-open .content-area {
+          margin-left: 230px;
         }
 
         .tab-container { max-width: 1200px; margin: 0 auto; }
         
         @media (max-width: 1024px) {
-          .nav-sidebar { width: 70px; padding: 2rem 0.6rem; }
-          .nav-label { display: none; }
-          .nav-header { display: none; }
-          .content-area { margin-left: 70px; padding: 2rem; }
+          .nav-sidebar { width: 230px; padding: 2.5rem 1.5rem; }
+          .nav-label { display: block; }
+          .nav-header { display: block; }
+          .content-area { padding: 4rem 2rem 2rem 2rem; }
         }
 
         /* ============================================
@@ -492,8 +605,27 @@ const App = () => {
           align-items: center;
           justify-content: center;
         }
+
+        /* ── GLOBAL AEROSPACE GLASS HUD EFFECT ── */
+        .tech-glass-panel {
+          background: rgba(8, 8, 8, 0.55) !important;
+          backdrop-filter: blur(14px) !important;
+          -webkit-backdrop-filter: blur(14px) !important;
+          border: 1px solid rgba(250, 204, 21, 0.15) !important;
+          box-shadow: 0 0 20px rgba(250, 204, 21, 0.05) !important;
+          transition: all 0.3s ease !important;
+        }
+
+        .tech-glass-panel:hover {
+          background: rgba(12, 12, 12, 0.65) !important;
+          border-color: rgba(250, 204, 21, 0.25) !important;
+          box-shadow: 0 0 25px rgba(250, 204, 21, 0.1) !important;
+          transform: translateY(-2px) !important;
+        }
       `}</style>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 

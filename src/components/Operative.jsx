@@ -119,8 +119,9 @@ const Operative = () => {
   const containerRef = useRef(null);
   const elementsRef = useRef([]);
   const [expandedSkill, setExpandedSkill] = useState(null);
-  const dragControls = useDragControls();
-  const rafRef = useRef(null);
+  const popupRef = useRef(null);
+  const dragState = useRef({ isDragging: false, startX: 0, startY: 0, currentX: 0, currentY: 0 });
+  const dragRaf = useRef(null);
 
   const registerElement = useCallback((el) => {
     if (el && !elementsRef.current.includes(el)) {
@@ -187,6 +188,63 @@ const Operative = () => {
     };
   }, []);
 
+  // Custom 60fps Drag Logic
+  useEffect(() => {
+    const handlePointerMove = (e) => {
+      if (!dragState.current.isDragging || !popupRef.current) return;
+      
+      const newX = e.clientX - dragState.current.startX;
+      const newY = e.clientY - dragState.current.startY;
+
+      const rect = popupRef.current.getBoundingClientRect();
+      const maxX = (window.innerWidth - rect.width) / 2;
+      const maxY = (window.innerHeight - rect.height) / 2;
+
+      dragState.current.currentX = Math.max(-maxX, Math.min(maxX, newX));
+      dragState.current.currentY = Math.max(-maxY, Math.min(maxY, newY));
+
+      if (!dragRaf.current) {
+        dragRaf.current = requestAnimationFrame(() => {
+          if (popupRef.current && window.innerWidth > 768) {
+            popupRef.current.style.transform = `translate(calc(-50% + ${dragState.current.currentX}px), calc(-50% + ${dragState.current.currentY}px))`;
+          }
+          dragRaf.current = null;
+        });
+      }
+    };
+
+    const handlePointerUp = () => {
+      dragState.current.isDragging = false;
+      document.body.style.userSelect = '';
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      if (dragRaf.current) cancelAnimationFrame(dragRaf.current);
+    };
+  }, []);
+
+  // Reset drag position when popup is opened/closed
+  useEffect(() => {
+    dragState.current.currentX = 0;
+    dragState.current.currentY = 0;
+    if (popupRef.current && window.innerWidth > 768) {
+      popupRef.current.style.transform = `translate(-50%, -50%)`;
+    }
+  }, [expandedSkill]);
+
+  const onDragStart = (e) => {
+    if (window.innerWidth <= 768) return;
+    dragState.current.isDragging = true;
+    dragState.current.startX = e.clientX - dragState.current.currentX;
+    dragState.current.startY = e.clientY - dragState.current.currentY;
+    document.body.style.userSelect = 'none';
+  };
+
   return (
     <div className="operative-container" ref={containerRef}>
       <div className="operative-bg-layer">
@@ -202,7 +260,7 @@ const Operative = () => {
       <div className="dossier-grid">
         <div className="dossier-left">
           <div className="profile-section-wrap">
-            <div className="profile-container tech-card">
+            <div className="profile-container tech-card tech-glass-panel">
               <div className="corner ct-l" /><div className="corner ct-r" />
               <div className="corner cb-l" /><div className="corner cb-r" />
               <div className="profile-image-wrap">
@@ -245,7 +303,7 @@ const Operative = () => {
               {CORE_CAPABILITIES.map((cap, i) => (
                 <div 
                   key={cap.id} 
-                  className={`capability-card tech-card ${expandedSkill?.id === cap.id ? 'active' : ''}`}
+                  className={`capability-card tech-card tech-glass-panel ${expandedSkill?.id === cap.id ? 'active' : ''}`}
                   onClick={() => setExpandedSkill(expandedSkill?.id === cap.id ? null : cap)}
                 >
                   <div className="skill-header mono">
@@ -280,16 +338,12 @@ const Operative = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
-                drag
-                dragControls={dragControls}
-                dragListener={false}
-                dragConstraints={{ left: -400, right: 400, top: -250, bottom: 250 }}
-                dragMomentum={false}
-                className="skill-detail-panel tech-card"
+                ref={popupRef}
+                className="skill-detail-panel tech-glass-panel"
               >
                 <div 
                   className="panel-header mono" 
-                  onPointerDown={(e) => dragControls.start(e)}
+                  onPointerDown={onDragStart}
                   style={{ cursor: 'grab' }}
                 >
                   <div className="highlight panel-expansion-title" ref={registerElement}>
@@ -381,7 +435,7 @@ const Operative = () => {
         .profile-container { 
           position: relative; 
           padding: 7px; 
-          background: #080808;
+          background: transparent;
         }
         
         .profile-image-wrap { position: relative; overflow: hidden; }
@@ -447,7 +501,7 @@ const Operative = () => {
           transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
           cursor: pointer;
           position: relative;
-          background: #0a0a0a;
+          background: transparent;
         }
 
         .capability-card:hover {
@@ -458,7 +512,7 @@ const Operative = () => {
         
         .capability-card.active {
           border-left-color: var(--yellow);
-          background: #0b0b0b;
+          background: transparent;
         }
 
         .cap-label-group { display: flex; align-items: center; gap: 0.9rem; }
@@ -501,14 +555,14 @@ const Operative = () => {
           max-height: min(85vh, 520px);
           z-index: 2000;
           overflow-y: auto;
-          background: #080808;
+          background: transparent;
           border-color: rgba(250, 204, 21, 0.2);
           box-shadow: 0 0 40px rgba(0,0,0,0.8);
         }
         
         .panel-header {
           padding: 1rem 1.5rem; 
-          background: #111; 
+          background: transparent; 
           border-bottom: 1px solid var(--border-dim);
           display: flex; 
           justify-content: space-between; 

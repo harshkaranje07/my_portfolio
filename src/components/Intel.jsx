@@ -138,7 +138,7 @@ const Intel = () => {
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 15 }}
                 transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
-                className="intel-modal-container tech-card"
+                className="intel-modal-container tech-glass-panel"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="intel-modal-header mono">
@@ -384,11 +384,15 @@ const Intel = () => {
           max-width: min(1000px, calc(100vw - 4rem));
           height: auto;
           max-height: min(90vh, calc(100vh - 4rem));
-          background: #080808;
           display: flex;
           flex-direction: column;
-          border: 1px solid rgba(250, 204, 21, 0.15);
-          box-shadow: 0 0 60px rgba(0,0,0,0.95);
+          overflow: hidden;
+        }
+
+        .intel-card {
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: transparent;
+          transition: all 0.3s ease;
           overflow: hidden;
         }
 
