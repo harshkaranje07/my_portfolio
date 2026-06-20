@@ -167,7 +167,7 @@ const Hero = ({ isHomeZone, setActiveTab }) => {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
-          word-break: break-word;
+          white-space: nowrap;
           position: relative;
         }
 
