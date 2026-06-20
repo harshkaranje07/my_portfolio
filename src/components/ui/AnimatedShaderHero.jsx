@@ -73,7 +73,9 @@ precision highp float;
 in vec4 position;
 void main(){gl_Position=position;}`;
 
-const AnimatedShaderBackground = () => {
+import ErrorBoundary from '../ErrorBoundary';
+
+const AnimatedShaderBackgroundInner = () => {
   const canvasRef = useRef(null);
   const stateRef = useRef({
     gl: null, program: null, buffer: null,
@@ -186,5 +188,11 @@ const AnimatedShaderBackground = () => {
     />
   );
 };
+
+const AnimatedShaderBackground = () => (
+  <ErrorBoundary>
+    <AnimatedShaderBackgroundInner />
+  </ErrorBoundary>
+);
 
 export default AnimatedShaderBackground;

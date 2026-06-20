@@ -1,7 +1,8 @@
 import React from "react";
 import { GrainGradient } from "@paper-design/shaders-react";
+import ErrorBoundary from "../ErrorBoundary";
 
-export function GradientBackground({ 
+function GradientBackgroundInner({ 
   colors = ["#FACC15", "#D4A017", "#FFE08A", "#111111", "#000000"],
   blur = "0px",
   opacity = 1,
@@ -30,5 +31,13 @@ export function GradientBackground({
         colors={colors}
       />
     </div>
+  );
+}
+
+export function GradientBackground(props) {
+  return (
+    <ErrorBoundary fallback={<div style={{ position: 'fixed', inset: 0, background: '#0a0a0a', zIndex: -1 }} />}>
+      <GradientBackgroundInner {...props} />
+    </ErrorBoundary>
   );
 }

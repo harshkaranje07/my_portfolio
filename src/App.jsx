@@ -10,6 +10,7 @@ import Uplink from './components/Uplink';
 import Drone from './components/Drone';
 import Timeline from './components/Timeline';
 import Intro from './components/Intro';
+import ErrorBoundary from './components/ErrorBoundary';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { GradientBackground } from './components/ui/paper-design-shader-background';
 
@@ -224,33 +225,35 @@ const App = () => {
       </AnimatePresence>
 
       <main className="content-area">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ 
-              opacity: 0, 
-              scale: activeTab === 'hero' ? 0.99 : 1,
-              x: activeTab === 'hero' ? 0 : 15,
-              y: activeTab === 'hero' ? 8 : 0
-            }}
-            animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-            exit={{ 
-              opacity: 0, 
-              scale: activeTab === 'hero' ? 0.99 : 1,
-              x: activeTab === 'hero' ? 0 : -15,
-              y: activeTab === 'hero' ? -4 : 0
-            }}
-            transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-            className="tab-container"
-          >
-            {activeTab === 'hero' && <Hero isHomeZone={isHomeZone} setActiveTab={setActiveTab} />}
-            {activeTab === 'about' && <Operative />}
-            {activeTab === 'timeline' && <Timeline />}
-            {activeTab === 'platforms' && <Arsenal />}
-            {activeTab === 'intel' && <Intel />}
-            {activeTab === 'contact' && <Uplink />}
-          </motion.div>
-        </AnimatePresence>
+        <ErrorBoundary>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ 
+                opacity: 0, 
+                scale: activeTab === 'hero' ? 0.99 : 1,
+                x: activeTab === 'hero' ? 0 : 15,
+                y: activeTab === 'hero' ? 8 : 0
+              }}
+              animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+              exit={{ 
+                opacity: 0, 
+                scale: activeTab === 'hero' ? 0.99 : 1,
+                x: activeTab === 'hero' ? 0 : -15,
+                y: activeTab === 'hero' ? -4 : 0
+              }}
+              transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+              className="tab-container"
+            >
+              {activeTab === 'hero' && <Hero isHomeZone={isHomeZone} setActiveTab={setActiveTab} />}
+              {activeTab === 'about' && <Operative />}
+              {activeTab === 'timeline' && <Timeline />}
+              {activeTab === 'platforms' && <Arsenal />}
+              {activeTab === 'intel' && <Intel />}
+              {activeTab === 'contact' && <Uplink />}
+            </motion.div>
+          </AnimatePresence>
+        </ErrorBoundary>
       </main>
 
       {/* Mobile Bottom Navigation Bar — only visible on screens ≤ 768px */}
