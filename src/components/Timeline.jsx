@@ -671,6 +671,27 @@ const Timeline = () => {
           .section-heading { font-size: 0.9rem; }
           .rank-value { font-size: 1.6rem; }
           .overlay-root { padding: 1rem; }
+          
+          .timeline-content-mount {
+            padding-left: 20px;
+          }
+          .node-axis {
+            left: -20px;
+            width: 20px;
+            top: 25px;
+          }
+          .card-cell {
+            padding-left: 8px;
+          }
+          .mission-card {
+            padding: 1.2rem;
+          }
+          .mission-name {
+            font-size: 1.15rem;
+          }
+          .rank-value {
+            font-size: 1.4rem;
+          }
         }
       `}</style>
     </div>

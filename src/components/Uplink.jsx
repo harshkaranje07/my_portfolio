@@ -244,6 +244,13 @@ const Uplink = () => {
             height: 300px;
           }
         }
+
+        @media (max-width: 360px) {
+          .radar-base {
+            width: 240px;
+            height: 240px;
+          }
+        }
         
         .radar-rings .ring { 
           position: absolute; 

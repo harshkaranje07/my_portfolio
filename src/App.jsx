@@ -225,7 +225,7 @@ const App = () => {
       </AnimatePresence>
 
       <main className="content-area">
-        <ErrorBoundary>
+        <ErrorBoundary resetKey={activeTab}>
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -533,14 +533,19 @@ const App = () => {
            Desktop/tablet layout is completely unchanged
            ============================================ */
         @media (max-width: 768px) {
+          /* Hide toggle button completely on mobile */
+          .sidebar-toggle-btn {
+            display: none !important;
+          }
+
           /* Hide the left sidebar entirely */
           .nav-sidebar {
-            display: none;
+            display: none !important;
           }
 
           /* Shift content to full width with bottom padding for nav bar */
           .content-area {
-            margin-left: 0;
+            margin-left: 0 !important;
             margin-top: 40px;
             padding: 1.2rem 1rem 6rem 1rem;
             height: calc(100vh - 40px);

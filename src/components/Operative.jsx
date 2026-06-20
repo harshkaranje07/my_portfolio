@@ -122,6 +122,7 @@ const Operative = () => {
   const popupRef = useRef(null);
   const dragState = useRef({ isDragging: false, startX: 0, startY: 0, currentX: 0, currentY: 0 });
   const dragRaf = useRef(null);
+  const rafRef = useRef(null);
 
   const registerElement = useCallback((el) => {
     if (el && !elementsRef.current.includes(el)) {
@@ -694,6 +695,12 @@ const Operative = () => {
           .tag-item { font-size: 0.74rem; }
           .capabilities-section { margin-bottom: 3rem; }
           .capability-card { padding: 1rem 1.2rem; }
+          .popup-wrapper {
+            position: fixed;
+            inset: 0;
+            transform: none;
+            pointer-events: none;
+          }
           .skill-detail-panel { 
             position: fixed;
             top: auto;
@@ -705,6 +712,7 @@ const Operative = () => {
             max-width: 100%;
             max-height: 70vh;
             border-radius: 0;
+            pointer-events: auto;
           }
         }
       `}</style>

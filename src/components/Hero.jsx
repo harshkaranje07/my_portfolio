@@ -158,7 +158,7 @@ const Hero = ({ isHomeZone, setActiveTab }) => {
       <style>{`
         .hero-name {
           font-family: var(--font-tech, "Inter", sans-serif);
-          font-size: clamp(2.5rem, 6vw, 5.5rem);
+          font-size: clamp(1.8rem, 6vw, 5.5rem);
           font-weight: 800;
           line-height: 1.05;
           letter-spacing: 0.02em;
@@ -167,8 +167,7 @@ const Hero = ({ isHomeZone, setActiveTab }) => {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
-          white-space: nowrap;
-          word-break: normal;
+          word-break: break-word;
           position: relative;
         }
 
