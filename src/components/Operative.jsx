@@ -338,9 +338,12 @@ const Operative = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
-                ref={popupRef}
-                className="skill-detail-panel tech-glass-panel"
+                className="popup-wrapper"
               >
+                <div 
+                  ref={popupRef}
+                  className="skill-detail-panel tech-glass-panel"
+                >
                 <div 
                   className="panel-header mono" 
                   onPointerDown={onDragStart}
@@ -375,6 +378,7 @@ const Operative = () => {
                 <div className="panel-footer mono" ref={registerElement}>
                   ID: {expandedSkill.id.toUpperCase()} // STATUS: VERIFIED
                 </div>
+              </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -400,10 +404,11 @@ const Operative = () => {
         }
 
         .operative-bg-layer {
-          position: fixed;
+          position: absolute;
           inset: 0;
+          background: transparent;
           z-index: -1;
-          pointer-events: none;
+          overflow: hidden;
         }
 
         .operative-header-block {
@@ -545,15 +550,25 @@ const Operative = () => {
           box-shadow: 0 0 8px var(--emerald-glow);
         }
         
-        /* Viewport-safe fixed panel */
-        .skill-detail-panel {
-          position: fixed; 
+        /* ------------------------------------- */
+        /* POPUP WRAPPER FOR DRAGGING FIX        */
+        /* ------------------------------------- */
+        .popup-wrapper {
+          position: fixed;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
+          z-index: 2000;
+        }
+
+        /* Viewport-safe fixed panel */
+        .skill-detail-panel {
+          position: relative; 
+          top: 0;
+          left: 0;
+          transform: translate(-50%, -50%);
           width: min(90vw, 380px);
           max-height: min(85vh, 520px);
-          z-index: 2000;
           overflow-y: auto;
           background: transparent;
           border-color: rgba(250, 204, 21, 0.2);
