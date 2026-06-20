@@ -139,7 +139,10 @@ const Intro = ({ onComplete }) => {
         }
 
         .pure-black-base {
-          display: none;
+          position: absolute;
+          inset: 0;
+          background: #050505;
+          z-index: 1;
         }
 
         /* ── New Atmosphere Styles ── */

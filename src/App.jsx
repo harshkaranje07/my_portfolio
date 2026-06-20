@@ -145,10 +145,11 @@ const App = () => {
   return (
     <>
       <GradientBackground {...getAtmosphereConfig()} />
-      {isBooting ? (
-        <Intro onComplete={handleBootComplete} />
-      ) : (
-        <div className={`app-container ${isDimmed ? 'dimmed-state' : ''} ${isHomeZone && activeTab === 'hero' ? 'home-active' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+      <AnimatePresence mode="wait">
+        {isBooting && <Intro key="intro-screen" onComplete={handleBootComplete} />}
+      </AnimatePresence>
+
+      <div className={`app-container ${isDimmed ? 'dimmed-state' : ''} ${isHomeZone && activeTab === 'hero' ? 'home-active' : ''} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
       <div className="global-haze" />
       <div className="hud-grid" />
       <div className="scanline-sweep" />
@@ -623,8 +624,7 @@ const App = () => {
           transform: translateY(-2px) !important;
         }
       `}</style>
-        </div>
-      )}
+      </div>
     </>
   );
 };
