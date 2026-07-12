@@ -46,29 +46,28 @@ const Drone = ({ isOffline }) => {
     const pos = posRef.current;
     const tgt = targetRef.current;
 
-    // Smooth LERP — 0.12 feels premium and fluid without lag
-    const lerpFactor = 0.12;
+    // Crisp LERP — 0.24 feels premium, fast, and responsive with zero lag
+    const lerpFactor = 0.24;
     pos.x += (tgt.x - pos.x) * lerpFactor;
     pos.y += (tgt.y - pos.y) * lerpFactor;
 
-    // Rotation based on movement direction
-    const dx = pos.x - prevPosRef.current.x;
-    const dy = pos.y - prevPosRef.current.y;
-    if (Math.abs(dx) > 0.2 || Math.abs(dy) > 0.2) {
+    // Rotation based on target direction
+    const dx = tgt.x - pos.x;
+    const dy = tgt.y - pos.y;
+    if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
       const targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
       let diff = targetAngle - rotRef.current;
       while (diff < -180) diff += 360;
       while (diff > 180) diff -= 360;
-      rotRef.current += diff * 0.1;
+      rotRef.current += diff * 0.18;
     }
-    prevPosRef.current = { x: pos.x, y: pos.y };
 
-    // Direct DOM manipulation — zero React overhead
+    // Direct GPU-accelerated DOM manipulation — zero layout thrashing, zero React overhead
     if (containerRef.current) {
       containerRef.current.style.transform =
-        `translate(${pos.x - 22}px, ${pos.y - 22}px)`;
+        `translate3d(${pos.x - 22}px, ${pos.y - 22}px, 0)`;
       containerRef.current.children[0].style.transform =
-        `rotate(${rotRef.current}deg)`;
+        `rotate3d(0, 0, 1, ${rotRef.current}deg)`;
     }
 
     rafRef.current = requestAnimationFrame(animate);

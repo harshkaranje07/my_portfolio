@@ -118,6 +118,7 @@ const DOSSIER = [
 const Operative = () => {
   const containerRef = useRef(null);
   const elementsRef = useRef([]);
+  const rectsCache = useRef([]);
   const [expandedSkill, setExpandedSkill] = useState(null);
   const popupRef = useRef(null);
   const dragState = useRef({ isDragging: false, startX: 0, startY: 0, currentX: 0, currentY: 0 });
@@ -130,13 +131,35 @@ const Operative = () => {
     }
   }, []);
 
-  // rAF-throttled glow, direct DOM writes (zero re-renders)
+  // Recalculate layout rectangles on mount/resize/tab changes
+  useEffect(() => {
+    const updateCache = () => {
+      rectsCache.current = elementsRef.current.map(el => {
+        if (!el || !document.contains(el)) return null;
+        return { el, rect: el.getBoundingClientRect() };
+      }).filter(Boolean);
+    };
+
+    // Delay slightly to ensure layout has settled
+    const timer = setTimeout(updateCache, 600);
+
+    window.addEventListener('resize', updateCache);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateCache);
+    };
+  }, [expandedSkill]);
+
+  // rAF-throttled glow, direct DOM writes using cached coordinates (zero layout reflows!)
   useEffect(() => {
     let lastMousePos = null;
     let frameCount = 0;
 
     const processGlow = () => {
-      if (!lastMousePos) return;
+      if (!lastMousePos || rectsCache.current.length === 0) {
+        rafRef.current = null;
+        return;
+      }
       frameCount++;
       if (frameCount % 3 !== 0) {
         rafRef.current = requestAnimationFrame(processGlow);
@@ -146,15 +169,9 @@ const Operative = () => {
       const { x: clientX, y: clientY } = lastMousePos;
       const threshold = 160;
 
-      // Batch read — avoid layout thrash
-      const rects = elementsRef.current.map(el => {
-        if (!el || !document.contains(el)) return null;
-        return { el, rect: el.getBoundingClientRect() };
-      });
-
-      // Batch write
-      rects.forEach(item => {
-        if (!item) return;
+      // Batch write using pre-measured rectangles
+      rectsCache.current.forEach(item => {
+        if (!item || !item.el || !document.contains(item.el)) return;
         const { el, rect } = item;
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
@@ -197,17 +214,14 @@ const Operative = () => {
       const newX = e.clientX - dragState.current.startX;
       const newY = e.clientY - dragState.current.startY;
 
-      const rect = popupRef.current.getBoundingClientRect();
-      const maxX = (window.innerWidth - rect.width) / 2;
-      const maxY = (window.innerHeight - rect.height) / 2;
-
+      const { maxX, maxY } = dragState.current;
       dragState.current.currentX = Math.max(-maxX, Math.min(maxX, newX));
       dragState.current.currentY = Math.max(-maxY, Math.min(maxY, newY));
 
       if (!dragRaf.current) {
         dragRaf.current = requestAnimationFrame(() => {
           if (popupRef.current && window.innerWidth > 768) {
-            popupRef.current.style.transform = `translate(calc(-50% + ${dragState.current.currentX}px), calc(-50% + ${dragState.current.currentY}px))`;
+            popupRef.current.style.transform = `translate3d(calc(-50% + ${dragState.current.currentX}px), calc(-50% + ${dragState.current.currentY}px), 0)`;
           }
           dragRaf.current = null;
         });
@@ -229,18 +243,46 @@ const Operative = () => {
     };
   }, []);
 
+  // Window resize handler: clear inline transform on mobile to preserve stylesheet layout
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        if (popupRef.current) {
+          popupRef.current.style.transform = '';
+        }
+      } else {
+        if (popupRef.current && !dragState.current.isDragging) {
+          popupRef.current.style.transform = `translate3d(calc(-50% + ${dragState.current.currentX}px), calc(-50% + ${dragState.current.currentY}px), 0)`;
+        }
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Reset drag position when popup is opened/closed
   useEffect(() => {
     dragState.current.currentX = 0;
     dragState.current.currentY = 0;
     if (popupRef.current && window.innerWidth > 768) {
-      popupRef.current.style.transform = `translate(-50%, -50%)`;
+      popupRef.current.style.transform = `translate3d(-50%, -50%, 0)`;
     }
   }, [expandedSkill]);
 
   const onDragStart = (e) => {
     if (window.innerWidth <= 768) return;
     dragState.current.isDragging = true;
+    
+    // Cache measurements on drag start to prevent layout thrashing / reflows during move
+    if (popupRef.current) {
+      const rect = popupRef.current.getBoundingClientRect();
+      dragState.current.maxX = Math.max(0, (window.innerWidth - rect.width) / 2);
+      dragState.current.maxY = Math.max(0, (window.innerHeight - rect.height) / 2);
+    } else {
+      dragState.current.maxX = window.innerWidth / 2;
+      dragState.current.maxY = window.innerHeight / 2;
+    }
+    
     dragState.current.startX = e.clientX - dragState.current.currentX;
     dragState.current.startY = e.clientY - dragState.current.currentY;
     document.body.style.userSelect = 'none';
@@ -343,7 +385,7 @@ const Operative = () => {
               >
                 <div 
                   ref={popupRef}
-                  className="skill-detail-panel tech-glass-panel"
+                  className="skill-detail-panel popup-glass-panel"
                 >
                 <div 
                   className="panel-header mono" 
@@ -567,13 +609,26 @@ const Operative = () => {
           position: relative; 
           top: 0;
           left: 0;
-          transform: translate(-50%, -50%);
+          transform: translate3d(-50%, -50%, 0);
           width: min(90vw, 380px);
           max-height: min(85vh, 520px);
           overflow-y: auto;
-          background: transparent;
-          border-color: rgba(250, 204, 21, 0.2);
           box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        }
+
+        .popup-glass-panel {
+          background: rgba(8, 8, 8, 0.55) !important;
+          backdrop-filter: blur(14px) !important;
+          -webkit-backdrop-filter: blur(14px) !important;
+          border: 1px solid rgba(250, 204, 21, 0.15) !important;
+          box-shadow: 0 0 20px rgba(250, 204, 21, 0.05) !important;
+          transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+        }
+
+        .popup-glass-panel:hover {
+          background: rgba(12, 12, 12, 0.65) !important;
+          border-color: rgba(250, 204, 21, 0.25) !important;
+          box-shadow: 0 0 25px rgba(250, 204, 21, 0.1) !important;
         }
         
         .panel-header {

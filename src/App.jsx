@@ -93,7 +93,8 @@ const App = () => {
         if (dist < minDistance) minDistance = dist;
       }
 
-      setIsHomeZone(minDistance < 200);
+      const isClose = minDistance < 200;
+      setIsHomeZone(prev => prev !== isClose ? isClose : prev);
       rafId = null;
     };
 
@@ -117,29 +118,53 @@ const App = () => {
   const getAtmosphereConfig = () => {
     if (isBooting) {
       // Intro
-      return { colors: ["#050505", "#111111", "#FACC15", "#D4A017", "#B8860B"], blur: "20px", opacity: 0.35, speed: 0.3 };
+      return { 
+        colors: ["#050505", "#111111", "#FACC15", "#D4A017", "#B8860B"], 
+        blur: "20px", opacity: 0.35, speed: 0.3 
+      };
     }
     switch (activeTab) {
       case 'hero': 
-        // Home: Untouched
-        return { colors: ["#FACC15", "#D4A017", "#FFE08A", "#111111", "#000000"], blur: "0px", opacity: 1.0, speed: 1 };
+        // Home: Deep Teal + Ocean Blue + Light Cyan premium aerospace command theme with custom grain noise
+        return { 
+          colors: ["#0F766E", "#164E63", "#67E8F9", "#050505", "#000000"], 
+          blur: "0px", opacity: 1.0, speed: 1.0, noise: 0.32 
+        };
       case 'about': 
         // Operative
-        return { colors: ["#050505", "#000000", "#111111", "#B8860B", "#FACC15"], blur: "20px", opacity: 0.65, speed: 0.4 };
+        return { 
+          colors: ["#050505", "#000000", "#111111", "#B8860B", "#FACC15"], 
+          blur: "20px", opacity: 0.65, speed: 0.4 
+        };
       case 'timeline': 
         // Mission Log
-        return { colors: ["#050505", "#050505", "#111111", "#B8860B", "#D4A017"], blur: "25px", opacity: 0.6, speed: 0.2 };
+        return { 
+          colors: ["#050505", "#050505", "#111111", "#B8860B", "#D4A017"], 
+          blur: "25px", opacity: 0.6, speed: 0.2 
+        };
       case 'platforms': 
         // Projects
-        return { colors: ["#000000", "#050505", "#111111", "#FACC15", "#D4A017"], blur: "20px", opacity: 0.6, speed: 0.4 };
+        return { 
+          colors: ["#000000", "#050505", "#111111", "#FACC15", "#D4A017"], 
+          blur: "20px", opacity: 0.6, speed: 0.4 
+        };
       case 'intel': 
         // Intel
-        return { colors: ["#050505", "#000000", "#111111", "#D4A017", "#B8860B"], blur: "30px", opacity: 0.55, speed: 0.3 };
+        return { 
+          colors: ["#050505", "#000000", "#111111", "#D4A017", "#B8860B"], 
+          blur: "30px", opacity: 0.55, speed: 0.3 
+        };
       case 'contact': 
         // Contact
-        return { colors: ["#000000", "#111111", "#B8860B", "#FACC15", "#D4A017"], blur: "25px", opacity: 0.65, speed: 0.3 };
+        return { 
+          colors: ["#000000", "#111111", "#B8860B", "#FACC15", "#D4A017"], 
+          blur: "25px", opacity: 0.65, speed: 0.3 
+        };
       default: 
-        return { colors: ["#050505", "#111111", "#FACC15", "#D4A017", "#000000"], blur: "20px", opacity: 0.6, speed: 0.3 };
+        return { 
+          colors: ["#050505", "#111111", "#FACC15", "#D4A017", "#000000"], 
+          blur: "20px", opacity: 0.6, speed: 0.3 
+        };
     }
   };
 
@@ -341,9 +366,9 @@ const App = () => {
           justify-content: space-between;
           align-items: center;
           padding: 0 2rem;
-          background: rgba(10, 10, 10, 0.55);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
+          background: rgba(8, 8, 8, 0.55);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
           border-bottom: 1px solid rgba(250, 204, 21, 0.15);
           box-shadow: 0 1px 15px rgba(250, 204, 21, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.05);
           z-index: 1100;

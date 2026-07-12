@@ -1,21 +1,21 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 
 const Hero = ({ isHomeZone, setActiveTab }) => {
-  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
   const sectionRef = useRef(null);
+  const overlayRef = useRef(null);
 
   const handleMouseMove = (e) => {
-    if (!sectionRef.current) return;
+    if (!sectionRef.current || !overlayRef.current) return;
     const rect = sectionRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    overlayRef.current.style.background = `radial-gradient(circle 350px at ${x}px ${y}px, rgba(250,204,21,0.15) 0%, rgba(250,204,21,0.02) 40%, transparent 100%)`;
   };
 
   const handleMouseLeave = () => {
-    // Move the glow far off screen when mouse leaves
-    setMousePos({ x: -1000, y: -1000 });
+    if (!overlayRef.current) return;
+    overlayRef.current.style.background = `radial-gradient(circle 350px at -1000px -1000px, rgba(250,204,21,0.15) 0%, rgba(250,204,21,0.02) 40%, transparent 100%)`;
   };
 
   const areasOfInterest = [
@@ -90,20 +90,20 @@ const Hero = ({ isHomeZone, setActiveTab }) => {
             width: '100%', 
             position: 'relative',
             padding: '2rem',
-            /* Pass CSS variables to children for proximity effects */
-            '--mouse-x': `${mousePos.x}px`,
-            '--mouse-y': `${mousePos.y}px`,
           }}
         >
           {/* Localized Proximity Glow Overlay */}
-          <div style={{
-            position: 'absolute',
-            top: 0, left: 0, right: 0, bottom: 0,
-            pointerEvents: 'none',
-            background: `radial-gradient(circle 350px at var(--mouse-x) var(--mouse-y), rgba(250,204,21,0.15) 0%, rgba(250,204,21,0.02) 40%, transparent 100%)`,
-            zIndex: 15,
-            mixBlendMode: 'color-dodge',
-          }} />
+          <div 
+            ref={overlayRef}
+            style={{
+              position: 'absolute',
+              top: 0, left: 0, right: 0, bottom: 0,
+              pointerEvents: 'none',
+              background: `radial-gradient(circle 350px at -1000px -1000px, rgba(250,204,21,0.15) 0%, rgba(250,204,21,0.02) 40%, transparent 100%)`,
+              zIndex: 15,
+              mixBlendMode: 'color-dodge',
+            }} 
+          />
 
           {/* ── Areas of Interest ── */}
           <div style={{ width: '100%', marginBottom: '3rem', position: 'relative', zIndex: 10 }}>

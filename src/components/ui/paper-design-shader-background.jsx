@@ -6,7 +6,11 @@ function GradientBackgroundInner({
   colors = ["#FACC15", "#D4A017", "#FFE08A", "#111111", "#000000"],
   blur = "0px",
   opacity = 1,
-  speed = 1
+  speed = 1,
+  softness = 0.76,
+  intensity = 0.45,
+  noise = 0.15,
+  colorBack = "#000000"
 }) {
   return (
     <div style={{ 
@@ -18,10 +22,10 @@ function GradientBackgroundInner({
     }}>
       <GrainGradient
         style={{ height: "100%", width: "100%", opacity: 1 }}
-        colorBack="#000000"
-        softness={0.76}
-        intensity={0.45}
-        noise={0.15}
+        colorBack={colorBack}
+        softness={softness}
+        intensity={intensity}
+        noise={noise}
         shape="corners"
         offsetX={0}
         offsetY={0}
